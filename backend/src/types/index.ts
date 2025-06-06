@@ -5,6 +5,7 @@ export type Currency = 'USD' | 'AUD' | 'SGD' | 'INR';
 export type WorkNature = 'onsite' | 'online';
 export type TaskCategory = 'Tutoring' | 'Handyman' | 'Consulting'; // Example categories
 export type SkillCategory = 'Tutoring' | 'Handyman' | 'Consulting'; // Example categories
+export type OfferStatus = 'pending' | 'accepted' | 'rejected' | 'withdrawn';
 
 export interface Address {
     streetNumber?: string;
@@ -113,6 +114,7 @@ export interface OfferDB {
     offered_hourly_rate: number;
     offered_rate_currency: Currency;
     offer_status: 'pending' | 'accepted' | 'rejected' | 'withdrawn';
+    message?: string; // <-- ADD THIS
     created_at: Date;
     updated_at: Date;
 }
@@ -124,6 +126,7 @@ export interface Offer {
     offeredHourlyRate: number;
     offeredRateCurrency: Currency;
     offerStatus: 'pending' | 'accepted' | 'rejected' | 'withdrawn';
+    message?: string; // <-- ADD THIS
     createdAt: Date;
     updatedAt: Date;
 }
@@ -212,6 +215,7 @@ export interface UpdateSkillRequest {
 export interface MakeOfferRequest {
     offeredHourlyRate: number;
     offeredRateCurrency: Currency;
+    message?: string;
 }
 
 export interface UpdateTaskProgressRequest {

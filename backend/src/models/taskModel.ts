@@ -13,8 +13,13 @@ export const createTask = async (userId: string, taskData: CreateTaskRequest): P
 };
 
 export const findTaskById = async (id: string): Promise<TaskDB | null> => {
-    const result = await db.query<TaskDB>('SELECT * FROM tasks WHERE id = $1', [id]);
-    return result.rows[0] || null;
+    try {
+        const result = await db.query<TaskDB>('SELECT * FROM tasks WHERE id = $1', [id]);
+        return result.rows[0] || null; // Returns the first row if found, otherwise null
+    } catch (error) {
+        console.error('Error in findTaskById model:', error);
+        throw error; // Re-throw to be caught by the controller
+    }
 };
 
 export const updateTask = async (id: string, userId: string, taskData: UpdateTaskRequest): Promise<Task | null> => {
@@ -42,7 +47,19 @@ export const findAllOpenTasks = async (): Promise<Task[]> => {
     const result = await db.query<TaskDB>("SELECT * FROM tasks WHERE status = 'open' ORDER BY created_at DESC");
     return result.rows.map(mapTaskDBToTask);
 };
+export const findAllTasks = async (status?: string): Promise<Task[]> => {
+    let query = 'SELECT * FROM tasks';
+    const params: string[] = [];
 
+    if (status) {
+        query += ' WHERE status = $1';
+        params.push(status);
+    }
+    query += ' ORDER BY created_at DESC';
+
+    const result = await db.query<TaskDB>(query, params);
+    return result.rows.map(mapTaskDBToTask);
+};
 export const updateTaskStatus = async (taskId: string, newStatus: string): Promise<Task | null> => {
     const result = await db.query<TaskDB>(
         `UPDATE tasks SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING *`,

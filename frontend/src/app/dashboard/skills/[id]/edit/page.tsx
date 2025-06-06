@@ -82,7 +82,7 @@ export default function EditSkillPage() {
         try {
             await api.put(`/skills/${skillId}`, formData);
             setSuccess('Skill updated successfully!');
-            router.push('/my-skills'); // Redirect back to my skills
+            router.push('/dashboard/my-skills'); // Redirect back to my skills
         } catch (err: any) {
             console.error('Failed to update skill:', err.response?.data || err);
             setError(err.response?.data?.message || 'Failed to update skill. Please try again.');

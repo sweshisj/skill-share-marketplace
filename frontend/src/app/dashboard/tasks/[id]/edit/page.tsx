@@ -89,7 +89,7 @@ export default function EditTaskPage() {
         try {
             await api.put(`/tasks/${taskId}`, formData);
             setSuccess('Task updated successfully!');
-            router.push('/my-tasks'); // Redirect back to my tasks
+            router.push('/dashboard/my-tasks'); // Redirect back to my tasks
         } catch (err: any) {
             console.error('Failed to update task:', err.response?.data || err);
             setError(err.response?.data?.message || 'Failed to update task. Please try again.');

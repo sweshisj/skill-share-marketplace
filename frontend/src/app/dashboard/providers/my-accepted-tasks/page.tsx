@@ -49,7 +49,7 @@ export default function MyAcceptedTasksPage() {
     }, [user, authLoading, router]);
 
     const handleViewProgress = (taskId: string) => {
-        router.push(`/tasks/${taskId}/progress`); // Provider can view/add progress
+        router.push(`/dashboard/tasks/${taskId}/progress`); // Provider can view/add progress
     };
 
     // Placeholder for "Mark Complete" or "Update Progress" if needed
@@ -82,7 +82,7 @@ export default function MyAcceptedTasksPage() {
             <h1 className="text-3xl font-bold mb-6 text-green-700">My Accepted Tasks</h1>
 
             {acceptedTasks.length === 0 ? (
-                <p className="text-gray-600 text-lg">You don't have any accepted tasks yet. <Link href="/browse-tasks" className="text-blue-600 hover:underline">Browse open tasks</Link> to make an offer!</p>
+                <p className="text-gray-600 text-lg">You don't have any accepted tasks yet. <Link href="/dashboard/browse-tasks" className="text-blue-600 hover:underline">Browse open tasks</Link> to make an offer!</p>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {acceptedTasks.map(task => (

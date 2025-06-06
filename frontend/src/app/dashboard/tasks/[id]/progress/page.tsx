@@ -163,8 +163,8 @@ export default function TaskProgressPage() {
             )}
 
             <div className="mt-8">
-                {isTaskOwner && <Link href="/my-tasks" className="text-blue-600 hover:underline">Back to My Tasks</Link>}
-                {isProvider && <Link href="/providers/my-accepted-tasks" className="text-blue-600 hover:underline">Back to My Accepted Tasks</Link>}
+                {isTaskOwner && <Link href="/dashboard/my-tasks" className="text-blue-600 hover:underline">Back to My Tasks</Link>}
+                {isProvider && <Link href="/dashboard/providers/my-accepted-tasks" className="text-blue-600 hover:underline">Back to My Accepted Tasks</Link>}
             </div>
         </div>
     );

@@ -87,7 +87,7 @@ export default function TaskOffersPage() {
             // Backend endpoint to accept an offer
             await api.put(`/offers/${offerId}/accept`);
             setSuccess('Offer accepted successfully! Task status updated.');
-            router.push('/my-tasks'); // Redirect back to my tasks, as task status will change
+            router.push('/dashboard/my-tasks'); // Redirect back to my tasks, as task status will change
         } catch (err: any) {
             console.error('Failed to accept offer:', err);
             setError(err.response?.data?.message || 'Failed to accept offer. Please try again.');
@@ -160,7 +160,7 @@ export default function TaskOffersPage() {
                 </div>
             )}
             <div className="mt-8">
-                <Link href="/my-tasks" className="text-blue-600 hover:underline">Back to My Tasks</Link>
+                <Link href="/dashboard/my-tasks" className="text-blue-600 hover:underline">Back to My Tasks</Link>
             </div>
         </div>
     );

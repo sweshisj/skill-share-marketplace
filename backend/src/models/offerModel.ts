@@ -1,39 +1,67 @@
 // backend/src/models/offerModel.ts
 import db from '../config/db';
-import { MakeOfferRequest, Offer, OfferDB } from '../types';
+import { MakeOfferRequest, Offer, OfferDB, OfferStatus } from '../types'; // Import OfferStatus
 import { mapOfferDBToOffer } from '../utils/mapper';
 
 export const createOffer = async (taskId: string, providerId: string, offerData: MakeOfferRequest): Promise<Offer> => {
-    const result = await db.query<OfferDB>(
-        `INSERT INTO offers (task_id, provider_id, offered_hourly_rate, offered_rate_currency)
-         VALUES ($1, $2, $3, $4) RETURNING *`,
-        [taskId, providerId, offerData.offeredHourlyRate, offerData.offeredRateCurrency]
-    );
-    return mapOfferDBToOffer(result.rows[0]);
+    try {
+        const result = await db.query<OfferDB>(
+            `INSERT INTO offers (task_id, provider_id, offered_hourly_rate, offered_rate_currency, message)
+             VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+            [taskId, providerId, offerData.offeredHourlyRate, offerData.offeredRateCurrency, offerData.message || null] // Added message
+        );
+        return mapOfferDBToOffer(result.rows[0]);
+    } catch (error) {
+        console.error('Error creating offer:', error);
+        throw error;
+    }
 };
 
-export const findOfferById = async (id: string): Promise<OfferDB | null> => {
-    const result = await db.query<OfferDB>('SELECT * FROM offers WHERE id = $1', [id]);
-    return result.rows[0] || null;
+export const findOfferById = async (id: string): Promise<Offer | null> => { // Returns mapped Offer type
+    try {
+        const result = await db.query<OfferDB>('SELECT * FROM offers WHERE id = $1', [id]);
+        return result.rows[0] ? mapOfferDBToOffer(result.rows[0]) : null;
+    } catch (error) {
+        console.error('Error finding offer by ID:', error);
+        throw error;
+    }
 };
 
-export const updateOfferStatus = async (offerId: string, newStatus: string): Promise<Offer | null> => {
-    const result = await db.query<OfferDB>(
-        `UPDATE offers SET offer_status = $1, updated_at = NOW() WHERE id = $2 RETURNING *`,
-        [newStatus, offerId]
-    );
-    return result.rows[0] ? mapOfferDBToOffer(result.rows[0]) : null;
+export const updateOfferStatus = async (offerId: string, newStatus: OfferStatus): Promise<Offer | null> => { // Use OfferStatus type
+    try {
+        const result = await db.query<OfferDB>(
+            `UPDATE offers SET offer_status = $1, updated_at = NOW() WHERE id = $2 RETURNING *`,
+            [newStatus, offerId]
+        );
+        return result.rows[0] ? mapOfferDBToOffer(result.rows[0]) : null;
+    } catch (error) {
+        console.error('Error updating offer status:', error);
+        throw error;
+    }
 };
 
 export const findOffersByTaskId = async (taskId: string): Promise<Offer[]> => {
-    const result = await db.query<OfferDB>('SELECT * FROM offers WHERE task_id = $1 ORDER BY created_at DESC', [taskId]);
-    return result.rows.map(mapOfferDBToOffer);
+    try {
+        const result = await db.query<OfferDB>('SELECT * FROM offers WHERE task_id = $1 ORDER BY created_at DESC', [taskId]);
+
+        // FIX: Explicitly type the item in the map callback
+        return result.rows.map((offerDBItem: OfferDB) => mapOfferDBToOffer(offerDBItem));
+
+    } catch (error) {
+        console.error('Error finding offers by task ID:', error);
+        throw error;
+    }
 };
 
-export const findAcceptedOfferForTask = async (taskId: string): Promise<OfferDB | null> => {
-    const result = await db.query<OfferDB>(
-        "SELECT * FROM offers WHERE task_id = $1 AND offer_status = 'accepted'",
-        [taskId]
-    );
-    return result.rows[0] || null;
+export const findAcceptedOfferForTask = async (taskId: string): Promise<Offer | null> => { // Returns mapped Offer | null
+    try {
+        const result = await db.query<OfferDB>(
+            "SELECT * FROM offers WHERE task_id = $1 AND offer_status = 'accepted'",
+            [taskId]
+        );
+        return result.rows[0] ? mapOfferDBToOffer(result.rows[0]) : null;
+    } catch (error) {
+        console.error('Error finding accepted offer for task:', error);
+        throw error;
+    }
 };

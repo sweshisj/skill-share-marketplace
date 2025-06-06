@@ -56,7 +56,7 @@ export default function CreateSkillPage() {
                 hourlyRate: 0,
                 rateCurrency: 'AUD',
             });
-            router.push('/my-skills'); // Redirect to my skills page
+            router.push('/dashboard/my-skills'); // Redirect to my skills page
         } catch (err: any) {
             console.error('Failed to create skill:', err.response?.data || err);
             setError(err.response?.data?.message || 'Failed to add skill. Please try again.');

@@ -75,7 +75,7 @@ export default function MySkillsPage() {
             <h1 className="text-3xl font-bold mb-6 text-green-700">My Skills</h1>
 
             {skills.length === 0 ? (
-                <p className="text-gray-600 text-lg">You haven't added any skills yet. <Link href="/create-skill" className="text-green-600 hover:underline">Add a new skill</Link>.</p>
+                <p className="text-gray-600 text-lg">You haven't added any skills yet. <Link href="/dashboard/create-skill" className="text-green-600 hover:underline">Add a new skill</Link>.</p>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {skills.map(skill => (

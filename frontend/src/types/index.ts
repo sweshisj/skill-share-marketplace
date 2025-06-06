@@ -113,6 +113,7 @@ export interface OfferDB {
     offered_hourly_rate: number;
     offered_rate_currency: Currency;
     offer_status: 'pending' | 'accepted' | 'rejected' | 'withdrawn';
+    message?: string;
     created_at: Date;
     updated_at: Date;
 }
@@ -124,6 +125,7 @@ export interface Offer {
     offeredHourlyRate: number;
     offeredRateCurrency: Currency;
     offerStatus: 'pending' | 'accepted' | 'rejected' | 'withdrawn';
+    message?: string;
     createdAt: Date;
     updatedAt: Date;
 }

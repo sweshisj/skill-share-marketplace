@@ -2,10 +2,11 @@
 import { Request, Response } from 'express';
 import { CreateTaskRequest, UpdateTaskProgressRequest, UpdateTaskRequest, UserType } from '../types';
 import {
-    createTask, findTaskById, updateTask, findTasksByUserId, findAllOpenTasks,
+    createTask, findTaskById, updateTask, findTasksByUserId, findAllOpenTasks, findAllTasks,
     updateTaskStatus, addTaskProgress, findTaskProgressByTaskId, findAcceptedTasksForProvider
 } from '../models/taskModel';
 import { createOffer, findOfferById, updateOfferStatus, findOffersByTaskId, findAcceptedOfferForTask } from '../models/offerModel';
+import { mapTaskDBToTask, mapOfferDBToOffer } from '../utils/mapper';
 
 interface AuthRequest extends Request {
     user?: { id: string; userType: UserType; email: string };
@@ -32,7 +33,48 @@ export const createTaskHandler = async (req: AuthRequest, res: Response) => {
         res.status(500).json({ message: 'Server error creating task', error: (error as Error).message });
     }
 };
+export const getTaskByIdController = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params; // Extract the ID from the URL parameter
+        console.log(`[getTaskByIdController] Attempting to fetch task with ID: ${id}`); // DEBUG LOG
 
+        const taskDB = await findTaskById(id); // Call your model function
+
+        if (!taskDB) {
+            console.log(`[getTaskByIdController] Task not found for ID: ${id}`); // DEBUG LOG
+            res.status(404).json({ message: 'Task not found.' }); // Send 404 if not found
+            return;
+        }
+
+        console.log(`[getTaskByIdController] Task found:`, taskDB); // DEBUG LOG
+        res.json(mapTaskDBToTask(taskDB)); // Send the found task
+    } catch (error) {
+        console.error('[getTaskByIdController] Error fetching task by ID:', error); // DEBUG LOG
+        res.status(500).json({ message: 'Server error fetching task.', error: (error as Error).message });
+    }
+};
+export const getTaskOffersController = async (req: AuthRequest, res: Response) => {
+    try {
+        const { taskId } = req.params; // Extract the task ID from the URL parameters
+        console.log(`[getTaskOffersController] Attempting to fetch offers for Task ID: ${taskId}`);
+
+        const offersDB = await findOffersByTaskId(taskId); // Call the model function
+
+        if (!offersDB || offersDB.length === 0) {
+            console.log(`[getTaskOffersController] No offers found for Task ID: ${taskId}`);
+
+            res.status(200).json([]);
+            return;
+        }
+
+        // Map the database results to your frontend-friendly Offer type
+        res.json((offersDB as any[]).map(mapOfferDBToOffer));
+
+    } catch (error) {
+        console.error('[getTaskOffersController] Error fetching offers for task:', error);
+        res.status(500).json({ message: 'Server error fetching offers.', error: (error as Error).message });
+    }
+};
 export const updateTaskHandler = async (req: AuthRequest, res: Response) => {
     try {
         const taskId = req.params.id;
@@ -79,7 +121,24 @@ export const getMyPostedTasksHandler = async (req: AuthRequest, res: Response) =
         res.status(500).json({ message: 'Server error fetching tasks', error: (error as Error).message });
     }
 };
+export const getAllTasks = async (req: Request, res: Response) => {
+    try {
+        const { status } = req.query; // Get the 'status' query parameter
 
+        let tasks;
+        if (typeof status === 'string' && status) {
+            // If status is provided, filter by it
+            tasks = await findAllTasks(status);
+        } else {
+            // Otherwise, get all tasks
+            tasks = await findAllTasks();
+        }
+        res.json(tasks);
+    } catch (error) {
+        console.error('Error fetching all tasks:', error);
+        res.status(500).json({ message: 'Server error fetching tasks.', error: (error as Error).message });
+    }
+};
 export const getAllOpenTasksHandler = async (req: Request, res: Response) => {
     try {
         const tasks = await findAllOpenTasks();
@@ -147,7 +206,7 @@ export const acceptOfferHandler = async (req: AuthRequest, res: Response) => {
             return;
         }
 
-        const task = await findTaskById(offer.task_id);
+        const task = await findTaskById(offer.taskId);
         if (!task || task.user_id !== userId) {
             res.status(403).json({ message: 'Forbidden, you do not own this task or task not found.' });
             return;
@@ -158,7 +217,7 @@ export const acceptOfferHandler = async (req: AuthRequest, res: Response) => {
         }
 
         // Reject all other offers for this task
-        const otherOffers = await findOffersByTaskId(offer.task_id);
+        const otherOffers = await findOffersByTaskId(offer.taskId);
         for (const o of otherOffers) {
             if (o.id !== offerId && o.offerStatus === 'pending') {
                 await updateOfferStatus(o.id, 'rejected');
@@ -173,7 +232,7 @@ export const acceptOfferHandler = async (req: AuthRequest, res: Response) => {
         }
 
         // Update task status to in_progress
-        await updateTaskStatus(offer.task_id, 'in_progress');
+        await updateTaskStatus(offer.taskId, 'in_progress');
 
         res.json({ message: 'Offer accepted and task status updated.', offer: acceptedOffer });
     } catch (error) {
@@ -197,12 +256,12 @@ export const rejectOfferHandler = async (req: AuthRequest, res: Response) => {
             return;
         }
 
-        const task = await findTaskById(offer.task_id);
+        const task = await findTaskById(offer.taskId);
         if (!task || task.user_id !== userId) {
             res.status(403).json({ message: 'Forbidden, you do not own this task or task not found.' });
             return;
         }
-        if (offer.offer_status !== 'pending') {
+        if (offer.offerStatus !== 'pending') {
             res.status(400).json({ message: 'Cannot reject an offer that is not pending.' });
             return;
         }
@@ -238,7 +297,7 @@ export const updateTaskProgressHandler = async (req: AuthRequest, res: Response)
         }
 
         const acceptedOffer = await findAcceptedOfferForTask(taskId);
-        if (!acceptedOffer || acceptedOffer.provider_id !== providerId) {
+        if (!acceptedOffer || acceptedOffer.providerId !== providerId) {
             res.status(403).json({ message: 'Forbidden, you are not the accepted provider for this task.' });
             return;
         }
@@ -273,7 +332,7 @@ export const markTaskCompletedHandler = async (req: AuthRequest, res: Response) 
         }
 
         const acceptedOffer = await findAcceptedOfferForTask(taskId);
-        if (!acceptedOffer || acceptedOffer.provider_id !== providerId) {
+        if (!acceptedOffer || acceptedOffer.providerId !== providerId) {
             res.status(403).json({ message: 'Forbidden, you are not the accepted provider for this task.' });
             return;
         }

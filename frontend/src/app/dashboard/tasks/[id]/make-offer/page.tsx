@@ -78,7 +78,7 @@ export default function MakeOfferPage() {
         try {
             await api.post(`/tasks/${taskId}/offers`, formData); // Endpoint to make an offer on a specific task
             setSuccess('Offer submitted successfully!');
-            router.push('/browse-tasks'); // Redirect back to browse tasks or to 'my offers' page
+            router.push('/dashboard/browse-tasks'); // Redirect back to browse tasks or to 'my offers' page
         } catch (err: any) {
             console.error('Failed to make offer:', err.response?.data || err);
             setError(err.response?.data?.message || 'Failed to submit offer. Please try again.');

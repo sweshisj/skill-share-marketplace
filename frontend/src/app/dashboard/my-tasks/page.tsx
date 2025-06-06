@@ -40,15 +40,15 @@ export default function MyTasksPage() {
     }, [user, authLoading, router]);
 
     const handleEditTask = (taskId: string) => {
-        router.push(`/tasks/${taskId}/edit`);
+        router.push(`/dashboard/tasks/${taskId}/edit`);
     };
 
     const handleViewOffers = (taskId: string) => {
-        router.push(`/tasks/${taskId}/offers`);
+        router.push(`/dashboard/tasks/${taskId}/offers`);
     };
 
     const handleViewProgress = (taskId: string) => {
-        router.push(`/tasks/${taskId}/progress`);
+        router.push(`/dashboard/tasks/${taskId}/progress`);
     };
 
     if (loading) {
@@ -64,7 +64,7 @@ export default function MyTasksPage() {
             <h1 className="text-3xl font-bold mb-6 text-blue-700">My Posted Tasks</h1>
 
             {tasks.length === 0 ? (
-                <p className="text-gray-600 text-lg">You haven't posted any tasks yet. <Link href="/create-task" className="text-blue-600 hover:underline">Post a new task</Link>.</p>
+                <p className="text-gray-600 text-lg">You haven't posted any tasks yet. <Link href="/dashboard/create-task" className="text-blue-600 hover:underline">Post a new task</Link>.</p>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {tasks.map(task => (

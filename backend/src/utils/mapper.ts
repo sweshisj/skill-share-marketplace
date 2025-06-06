@@ -75,17 +75,20 @@ export const mapSkillDBToSkill = (skillDB: SkillDB): Skill => {
 };
 
 export const mapOfferDBToOffer = (offerDB: OfferDB): Offer => {
+    if (!offerDB.id) console.error('Mapper received offerDB with missing ID:', offerDB);
     return {
         id: offerDB.id,
         taskId: offerDB.task_id,
         providerId: offerDB.provider_id,
-        offeredHourlyRate: parseFloat(offerDB.offered_hourly_rate.toString()),
+        offeredHourlyRate: offerDB.offered_hourly_rate,
         offeredRateCurrency: offerDB.offered_rate_currency,
         offerStatus: offerDB.offer_status,
+        message: offerDB.message || undefined,
         createdAt: offerDB.created_at,
         updatedAt: offerDB.updated_at,
     };
 };
+
 
 export const mapTaskProgressDBToTaskProgress = (tpDB: TaskProgressDB): TaskProgress => {
     return {

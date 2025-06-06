@@ -19,6 +19,10 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, provider, showActions = tr
         withdrawn: 'bg-gray-100 text-gray-600',
     };
 
+    // Ensure offerStatus is a string before calling .replace()
+    // Using nullish coalescing operator '??' to provide a default string if offer.offerStatus is null/undefined
+    const displayStatus = offer.offerStatus?.replace(/_/g, ' ') ?? 'Unknown Status';
+
     return (
         <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
             <h3 className="text-lg font-bold mb-2 text-gray-800">
@@ -29,9 +33,14 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, provider, showActions = tr
             </p>
             <p className="text-sm text-gray-600 mb-4">
                 Status: <span className={`font-semibold py-1 px-2 rounded-full ${statusColor[offer.offerStatus]}`}>
-                    {offer.offerStatus.replace(/_/g, ' ')}
+                    {/* Use the safely formatted displayStatus */}
+                    {displayStatus}
                 </span>
             </p>
+            {/* If you plan to display offer.message, ensure it's also handled safely */}
+            {offer.message && (
+                <p className="text-sm text-gray-600 mb-2">Message: {offer.message}</p>
+            )}
             <p className="text-xs text-gray-500">
                 Made on: {new Date(offer.createdAt).toLocaleDateString()}
             </p>

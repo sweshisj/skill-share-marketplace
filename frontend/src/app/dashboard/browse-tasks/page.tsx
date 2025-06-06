@@ -40,7 +40,7 @@ export default function BrowseTasksPage() {
     }, [user, authLoading, router]);
 
     const handleMakeOffer = (taskId: string) => {
-        router.push(`/tasks/${taskId}/make-offer`);
+        router.push(`/dashboard/tasks/${taskId}/make-offer`);
     };
 
     if (loading) {

@@ -1,8 +1,7 @@
 // frontend/src/app/(dashboard)/layout.tsx
-'use client'; // This is a client component as it uses AuthContext and Navbar
+'use client';
 
-import { AuthProvider } from '../../context/AuthContext';
-import Navbar from '../../components/Navbar'; // Ensure Navbar is imported and exists
+import Navbar from '../../components/Navbar';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext'; // To check authentication status
@@ -13,7 +12,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const { isAuthenticated, loading } = useAuth(); // Access auth state from context
+  const { isAuthenticated, loading } = useAuth(); // This now correctly accesses context from a higher-level AuthProvider
 
   useEffect(() => {
     // Redirect to login if not authenticated and not currently loading auth state
@@ -22,24 +21,23 @@ export default function DashboardLayout({
     }
   }, [isAuthenticated, loading, router]); // Depend on isAuthenticated, loading, and router
 
-  // Only render content if authenticated or still loading (to prevent flickering)
+  // Render a loading state or nothing while authentication status is being determined
+  // or if the user is not authenticated and is about to be redirected.
   if (loading || !isAuthenticated()) {
-    // You can render a loading spinner or null here
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <p className="text-xl text-gray-600">Loading dashboard...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <p className="text-xl text-gray-600">Loading dashboard...</p>
+      </div>
     );
   }
 
+  // Render the dashboard layout once authenticated
   return (
-    <AuthProvider> {/* Ensure AuthProvider wraps content if AuthContext is used inside children */}
-        <div className="min-h-screen bg-gray-100">
-            <Navbar />
-            <main className="container mx-auto p-4 md:p-8">
-                {children}
-            </main>
-        </div>
-    </AuthProvider>
+    <div className="min-h-screen bg-gray-100">
+      <Navbar />
+      <main className="container mx-auto p-4 md:p-8">
+        {children}
+      </main>
+    </div>
   );
 }

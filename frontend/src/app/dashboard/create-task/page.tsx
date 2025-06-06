@@ -61,7 +61,7 @@ export default function CreateTaskPage() {
                 hourlyRateOffered: 0,
                 rateCurrency: 'AUD',
             });
-            router.push('/my-tasks'); // Redirect to the user's posted tasks page
+            router.push('/dashboard/my-tasks'); // Redirect to the user's posted tasks page
         } catch (err: any) {
             console.error('Failed to create task:', err.response?.data || err);
             setError(err.response?.data?.message || 'Failed to create task. Please try again.');

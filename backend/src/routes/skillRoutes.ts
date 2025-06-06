@@ -7,6 +7,5 @@ const router = Router();
 
 router.post('/', protect, authorizeRoles(['company', 'individual']), createSkillHandler);
 router.put('/:id', protect, authorizeRoles(['company', 'individual']), updateSkillHandler);
-router.get('/me', protect, authorizeRoles(['company', 'individual']), getMySkillsHandler);
-
+router.get('/my-posted-skills', protect, authorizeRoles(['company', 'individual']), getMySkillsHandler);
 export default router;

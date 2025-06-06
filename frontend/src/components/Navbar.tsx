@@ -25,16 +25,16 @@ export default function Navbar() {
                         <>
                             {canPostTask() && (
                                 <>
-                                    <Link href="/my-tasks" className="hover:text-blue-200 transition-colors duration-200">My Tasks</Link>
-                                    <Link href="/create-task" className="hover:text-blue-200 transition-colors duration-200">Post Task</Link>
+                                    <Link href="/dashboard/my-tasks" className="hover:text-blue-200 transition-colors duration-200">My Tasks</Link>
+                                    <Link href="/dashboard/create-task" className="hover:text-blue-200 transition-colors duration-200">Post Task</Link>
                                 </>
                             )}
                             {canPostSkill() && (
                                 <>
-                                    <Link href="/browse-tasks" className="hover:text-blue-200 transition-colors duration-200">Browse Tasks</Link>
-                                    <Link href="/my-skills" className="hover:text-blue-200 transition-colors duration-200">My Skills</Link>
-                                    <Link href="/create-skill" className="hover:text-blue-200 transition-colors duration-200">Add Skill</Link>
-                                    <Link href="/providers/my-accepted-tasks" className="hover:text-blue-200 transition-colors duration-200">Accepted Tasks</Link>
+                                    <Link href="/dashboard/browse-tasks" className="hover:text-blue-200 transition-colors duration-200">Browse Tasks</Link>
+                                    <Link href="/dashboard/my-skills" className="hover:text-blue-200 transition-colors duration-200">My Skills</Link>
+                                    <Link href="/dashboard/create-skill" className="hover:text-blue-200 transition-colors duration-200">Add Skill</Link>
+                                    <Link href="/dashboard/providers/my-accepted-tasks" className="hover:text-blue-200 transition-colors duration-200">Accepted Tasks</Link>
                                 </>
                             )}
                             <span className="text-blue-200 text-lg font-medium ml-4">
