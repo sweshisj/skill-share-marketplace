@@ -191,6 +191,7 @@ export interface UpdateTaskRequest {
     expectedWorkingHours?: number;
     hourlyRateOffered?: number;
     rateCurrency?: Currency;
+    status?: string;
 }
 
 export interface CreateSkillRequest {
