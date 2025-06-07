@@ -1,10 +1,10 @@
 // frontend/src/components/OfferCard.tsx
 import React from 'react';
-import { Offer, User } from '../types'; // Assuming User is also needed for provider info
+import { Offer, ProviderPublicDetails } from '../types'; // Assuming User is also needed for provider info
 
 interface OfferCardProps {
     offer: Offer;
-    provider?: User; // Optional: To display provider details if available
+    provider?: ProviderPublicDetails; // Optional: To display provider details if available
     showActions?: boolean;
     onAccept?: (offerId: string) => void;
     onReject?: (offerId: string) => void;

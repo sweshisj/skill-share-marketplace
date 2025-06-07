@@ -221,3 +221,14 @@ export interface MakeOfferRequest {
 export interface UpdateTaskProgressRequest {
     description: string;
 }
+export interface ProviderPublicDetails {
+    id: string;
+    userType: UserType;
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    companyName?: string;
+}
+export interface OfferWithProvider extends Offer {
+    providerDetails?: ProviderPublicDetails; 
+}

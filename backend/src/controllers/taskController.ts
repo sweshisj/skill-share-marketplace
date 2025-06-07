@@ -1,12 +1,13 @@
 // backend/src/controllers/taskController.ts
 import { Request, Response } from 'express';
-import { CreateTaskRequest, UpdateTaskProgressRequest, UpdateTaskRequest, UserType } from '../types';
+import { CreateTaskRequest, UpdateTaskProgressRequest, UpdateTaskRequest, UserType, OfferWithProvider, ProviderPublicDetails, Offer } from '../types';
 import {
     createTask, findTaskById, updateTask, findTasksByUserId, findAllOpenTasks, findAllTasks,
     updateTaskStatus, addTaskProgress, findTaskProgressByTaskId, findAcceptedTasksForProvider
 } from '../models/taskModel';
 import { createOffer, findOfferById, updateOfferStatus, findOffersByTaskId, findAcceptedOfferForTask } from '../models/offerModel';
 import { mapTaskDBToTask, mapOfferDBToOffer } from '../utils/mapper';
+import { findOffersWithProviderDetailsByTaskId } from '../models/offerModel';
 
 interface AuthRequest extends Request {
     user?: { id: string; userType: UserType; email: string };
@@ -55,23 +56,22 @@ export const getTaskByIdController = async (req: Request, res: Response) => {
 };
 export const getTaskOffersController = async (req: AuthRequest, res: Response) => {
     try {
-        const { taskId } = req.params; // Extract the task ID from the URL parameters
-        console.log(`[getTaskOffersController] Attempting to fetch offers for Task ID: ${taskId}`);
+        const { taskId } = req.params;
+        console.log(`[getTaskOffersController] Attempting to fetch offers and provider details for Task ID: ${taskId}`);
 
-        const offersDB = await findOffersByTaskId(taskId); // Call the model function
+        // Call the new model function to get offers with provider details
+        const offersWithProviders: OfferWithProvider[] = await findOffersWithProviderDetailsByTaskId(taskId);
 
-        if (!offersDB || offersDB.length === 0) {
+        if (offersWithProviders.length === 0) {
             console.log(`[getTaskOffersController] No offers found for Task ID: ${taskId}`);
-
             res.status(200).json([]);
             return;
         }
 
-        // Map the database results to your frontend-friendly Offer type
-        res.json((offersDB as any[]).map(mapOfferDBToOffer));
+        res.json(offersWithProviders);
 
     } catch (error) {
-        console.error('[getTaskOffersController] Error fetching offers for task:', error);
+        console.error('[getTaskOffersController] Error fetching offers and provider details for task:', error);
         res.status(500).json({ message: 'Server error fetching offers.', error: (error as Error).message });
     }
 };

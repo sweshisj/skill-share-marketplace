@@ -34,7 +34,7 @@ export default function TaskOffersPage() {
             return;
         }
 
-        const fetchTaskAndOffers = async () => {
+       const fetchTaskAndOffers = async () => {
             try {
                 // Fetch task details
                 const taskResponse = await api.get<Task>(`/tasks/${taskId}`);
@@ -46,22 +46,10 @@ export default function TaskOffersPage() {
                     setLoading(false);
                     return;
                 }
+                const offersResponse = await api.get<OfferWithProvider[]>(`/tasks/${taskId}/offers`);
 
-                // Fetch offers for this task
-                const offersResponse = await api.get<Offer[]>(`/tasks/${taskId}/offers`);
-
-                // For each offer, try to fetch provider details (optional, can be optimized by backend)
-                const offersWithProviders = await Promise.all(offersResponse.data.map(async (offer) => {
-                    try {
-                        const providerRes = await api.get<User>(`/users/${offer.providerId}`); // Assuming a public user profile endpoint
-                        return { ...offer, providerDetails: providerRes.data };
-                    } catch (providerErr) {
-                        console.warn(`Could not fetch details for provider ${offer.providerId}:`, providerErr);
-                        return { ...offer, providerDetails: undefined };
-                    }
-                }));
-
-                setOffers(offersWithProviders);
+             
+                setOffers(offersResponse.data);
 
             } catch (err: any) {
                 console.error('Failed to fetch task or offers:', err);
@@ -132,6 +120,7 @@ export default function TaskOffersPage() {
     }
 
     return (
+        
         <div className="p-6 bg-white rounded-lg shadow-md border border-gray-200">
             <h1 className="text-3xl font-bold mb-4 text-purple-700">Offers for "{task.taskName}"</h1>
             <p className="mb-6 text-gray-600">Task Status: <span className={`font-semibold ${

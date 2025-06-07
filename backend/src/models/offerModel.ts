@@ -1,6 +1,6 @@
 // backend/src/models/offerModel.ts
 import db from '../config/db';
-import { MakeOfferRequest, Offer, OfferDB, OfferStatus } from '../types'; // Import OfferStatus
+import { MakeOfferRequest, Offer, OfferDB, OfferStatus, OfferWithProvider, ProviderPublicDetails } from '../types'; // Import OfferStatus
 import { mapOfferDBToOffer } from '../utils/mapper';
 
 export const createOffer = async (taskId: string, providerId: string, offerData: MakeOfferRequest): Promise<Offer> => {
@@ -63,5 +63,52 @@ export const findAcceptedOfferForTask = async (taskId: string): Promise<Offer | 
     } catch (error) {
         console.error('Error finding accepted offer for task:', error);
         throw error;
+    }
+};
+export const findOffersWithProviderDetailsByTaskId = async (taskId: string): Promise<OfferWithProvider[]> => {
+    try {
+        const result = await db.query(
+            `SELECT
+                o.id, o.task_id, o.provider_id, o.offered_hourly_rate, o.offered_rate_currency,
+                o.offer_status, o.message, o.created_at, o.updated_at,
+                u.id AS user_id, u.user_type, u.email, u.first_name, u.last_name, u.company_name
+             FROM offers o
+             JOIN users u ON o.provider_id = u.id
+             WHERE o.task_id = $1
+             ORDER BY o.created_at DESC`,
+            [taskId]
+        );
+
+        if (result.rows.length === 0) {
+            return [];
+        }
+
+        // Map the combined DB results to OfferWithProvider type
+        const offersWithProviders: OfferWithProvider[] = result.rows.map((row: any) => {
+            // Re-use your existing mapOfferDBToOffer for the core offer fields
+            // Ensure mapOfferDBToOffer expects an object with snake_case keys (like the DB rows)
+            const offer: Offer = mapOfferDBToOffer(row);
+
+            // Map Provider Public Details from the joined user columns
+            const providerDetails: ProviderPublicDetails = {
+                id: row.user_id, // Alias from the SQL query
+                userType: row.user_type,
+                email: row.email,
+                firstName: row.first_name,
+                lastName: row.last_name,
+                companyName: row.company_name,
+            };
+
+            return {
+                ...offer,
+                providerDetails: providerDetails,
+            };
+        });
+
+        return offersWithProviders;
+
+    } catch (error) {
+        console.error(`Error finding offers with provider details for task ID ${taskId}:`, error);
+        throw error; // Re-throw to be caught by the controller
     }
 };
