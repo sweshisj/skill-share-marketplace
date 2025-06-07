@@ -73,7 +73,7 @@ export default function TaskOffersPage() {
         setSuccess(null);
         try {
             // Backend endpoint to accept an offer
-            await api.put(`/offers/${offerId}/accept`);
+            await api.put(`tasks/offers/${offerId}/accept`);
             setSuccess('Offer accepted successfully! Task status updated.');
             router.push('/dashboard/my-tasks'); // Redirect back to my tasks, as task status will change
         } catch (err: any) {
@@ -93,7 +93,7 @@ export default function TaskOffersPage() {
         setSuccess(null);
         try {
             // Backend endpoint to reject an offer
-            await api.put(`/offers/${offerId}/reject`);
+            await api.put(`tasks/offers/${offerId}/reject`);
             setSuccess('Offer rejected successfully.');
             // Update the local state to reflect the rejection
             setOffers(prevOffers => prevOffers.map(offer =>
