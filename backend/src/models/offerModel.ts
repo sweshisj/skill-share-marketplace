@@ -16,7 +16,28 @@ export const createOffer = async (taskId: string, providerId: string, offerData:
         throw error;
     }
 };
-
+export const findOfferByProviderIdAndTaskId = async (
+    providerId: string,
+    taskId: string,
+    status?: OfferStatus
+): Promise<Offer | null> => {
+    try {
+        let query = 'SELECT * FROM offers WHERE provider_id = $1 AND task_id = $2';
+        let params: any[] = [providerId, taskId];
+        if (status) {
+            query += ' AND offer_status = $3';
+            params.push(status);
+        }
+        const result = await db.query(query, params);
+        if (result.rows.length === 0) {
+            return null;
+        }
+        return mapOfferDBToOffer(result.rows[0]);
+    } catch (error) {
+        console.error(`Error finding offer by provider ${providerId} and task ${taskId}:`, error);
+        throw error;
+    }
+};
 export const findOfferById = async (id: string): Promise<Offer | null> => { // Returns mapped Offer type
     try {
         const result = await db.query<OfferDB>('SELECT * FROM offers WHERE id = $1', [id]);

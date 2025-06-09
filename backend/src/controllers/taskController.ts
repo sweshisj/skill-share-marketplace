@@ -1,14 +1,13 @@
 // backend/src/controllers/taskController.ts
 import { Request, Response } from 'express';
-import { CreateTaskRequest, UpdateTaskProgressRequest, UpdateTaskRequest, UserType, OfferWithProvider, ProviderPublicDetails, Offer } from '../types';
+import { CreateTaskRequest, CreateTaskProgressRequest, UpdateTaskProgressRequest, UpdateTaskRequest, UserType, OfferWithProvider, ProviderPublicDetails, Offer } from '../types';
 import {
     createTask, findTaskById, updateTask, findTasksByUserId, findAllOpenTasks, findAllTasks,
-    updateTaskStatus, addTaskProgress, findTaskProgressByTaskId, findAcceptedTasksForProvider
+    updateTaskStatus, findAcceptedTasksForProvider, createTaskProgressUpdate, getTaskProgressUpdates,
 } from '../models/taskModel';
 import { createOffer, findOfferById, updateOfferStatus, findOffersByTaskId, findAcceptedOfferForTask } from '../models/offerModel';
 import { mapTaskDBToTask, mapOfferDBToOffer } from '../utils/mapper';
-import { findOffersWithProviderDetailsByTaskId } from '../models/offerModel';
-
+import { findOffersWithProviderDetailsByTaskId, findOfferByProviderIdAndTaskId } from '../models/offerModel';
 interface AuthRequest extends Request {
     user?: { id: string; userType: UserType; email: string };
     task?: any; // To hold task data from middleware
@@ -279,14 +278,68 @@ export const rejectOfferHandler = async (req: AuthRequest, res: Response) => {
     }
 };
 
+/**
+ * @desc Add a progress update to a task
+ * @route POST /api/v1/tasks/:taskId/progress
+ * @access Private (Accepted Provider)
+ */
 export const updateTaskProgressHandler = async (req: AuthRequest, res: Response) => {
     try {
-        const taskId = req.params.taskId;
-        const providerId = req.user?.id;
-        const { description }: UpdateTaskProgressRequest = req.body;
+        const { taskId } = req.params;
+        const { description }: CreateTaskProgressRequest = req.body;
+        const providerId = req.user?.id; // Authenticated user is the provider
 
-        if (!taskId || !providerId || !description) {
-            res.status(400).json({ message: 'Task ID, Provider ID, and description are required.' });
+        if (!providerId || !description) {
+            res.status(400).json({ message: 'Description and authenticated user ID are required.' });
+            return
+        }
+
+        const task = await findTaskById(taskId);
+        if (!task) {
+            res.status(404).json({ message: 'Task not found.' });
+            return;
+        }
+
+        // Authorization: Ensure the logged-in user is the provider who accepted this task
+        // You'll need a way to check which provider accepted the task.
+        // Assuming you have an 'acceptedOffer' field on the Task, or can query offers.
+        // For simplicity, let's assume the task's 'providerId' is set when an offer is accepted.
+        // If not, you might need to query `offers` table for the 'accepted' offer for this task.
+        const acceptedOffer = await findOfferByProviderIdAndTaskId(providerId, taskId, 'accepted');
+
+        if (!acceptedOffer) {
+           res.status(403).json({ message: 'You are not the accepted provider for this task.' });
+           return
+        }
+
+        // Check if task is actually in progress
+        if (task.status !== 'in_progress') {
+            res.status(400).json({ message: 'Task is not in progress. Cannot add progress update.' });
+            return
+        }
+
+        const newProgress = await createTaskProgressUpdate(taskId, providerId, description);
+
+        res.status(201).json({ message: 'Progress update added successfully.', progress: newProgress });
+
+    } catch (error) {
+        console.error('[updateTaskProgressHandler] Error adding task progress:', error);
+        res.status(500).json({ message: 'Server error adding task progress.', error: (error as Error).message });
+    }
+};
+
+/**
+ * @desc Get all progress updates for a task
+ * @route GET /api/v1/tasks/:taskId/progress
+ * @access Private (Task Owner or Accepted Provider)
+ */
+export const getTaskProgressController = async (req: AuthRequest, res: Response) => {
+    try {
+        const { taskId } = req.params;
+        const userId = req.user?.id;
+
+        if (!userId) {
+            res.status(401).json({ message: 'Not authenticated.' });
             return;
         }
 
@@ -296,24 +349,26 @@ export const updateTaskProgressHandler = async (req: AuthRequest, res: Response)
             return;
         }
 
-        const acceptedOffer = await findAcceptedOfferForTask(taskId);
-        if (!acceptedOffer || acceptedOffer.providerId !== providerId) {
-            res.status(403).json({ message: 'Forbidden, you are not the accepted provider for this task.' });
+        // Authorization: Only task owner OR accepted provider can view progress
+        const isTaskOwner = task.user_id === userId;
+        const acceptedOffer = await findOfferByProviderIdAndTaskId(userId, taskId, 'accepted');
+        const isAcceptedProvider = !!acceptedOffer; // True if an accepted offer exists for this provider and task
+
+        if (!isTaskOwner && !isAcceptedProvider) {
+            res.status(403).json({ message: 'You are not authorized to view progress updates for this task.' });
             return;
         }
 
-        if (task.status !== 'in_progress') {
-            res.status(400).json({ message: 'Task is not in progress. Cannot update progress.' });
-            return;
-        }
+        const progressUpdates = await getTaskProgressUpdates(taskId);
 
-        const newProgress = await addTaskProgress(taskId, providerId, description);
-        res.status(201).json({ message: 'Task progress updated.', progress: newProgress });
+        res.status(200).json(progressUpdates);
+
     } catch (error) {
-        console.error('Update task progress error:', error);
-        res.status(500).json({ message: 'Server error updating task progress', error: (error as Error).message });
+        console.error('[getTaskProgressController] Error fetching task progress:', error);
+        res.status(500).json({ message: 'Server error fetching task progress.', error: (error as Error).message });
     }
 };
+
 
 export const markTaskCompletedHandler = async (req: AuthRequest, res: Response) => {
     try {

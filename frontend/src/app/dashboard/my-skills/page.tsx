@@ -42,7 +42,7 @@ export default function MySkillsPage() {
     }, [user, authLoading, canPostSkill, router]);
 
     const handleEditSkill = (skillId: string) => {
-        router.push(`/skills/${skillId}/edit`);
+        router.push(`/dashboard/skills/${skillId}/edit`);
     };
 
     const handleDeleteSkill = async (skillId: string) => {

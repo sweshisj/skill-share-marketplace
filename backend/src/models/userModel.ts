@@ -9,7 +9,7 @@ export const createUser = async (userData: CreateUserRequest, hashedPassword: st
         await client.query('BEGIN');
 
         const {
-            userType, email, mobileNumber,
+            userType, email,
             firstName, lastName,
             companyName, phoneNumber, businessTaxNumber,
             representativeFirstName, representativeLastName,
@@ -19,20 +19,20 @@ export const createUser = async (userData: CreateUserRequest, hashedPassword: st
         // Common fields + specific fields based on userType
         const result = await client.query(
             `INSERT INTO users (
-                user_type, email, password_hash, mobile_number,
+                user_type, email, password_hash,
                 first_name, last_name,
                 company_name, phone_number, business_tax_number,
                 street_number, street_name, city_suburb, state, post_code
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
             RETURNING *`,
             [
-                userType, email, hashedPassword, mobileNumber,
+                userType, email, hashedPassword, 
                 // Individual fields
                 userType === 'individual' ? firstName : representativeFirstName,
                 userType === 'individual' ? lastName : representativeLastName,
                 // Company fields
                 userType === 'company' ? companyName : null,
-                userType === 'company' ? phoneNumber : null,
+                phoneNumber || null,
                 userType === 'company' ? businessTaxNumber : null,
                 // Address fields
                 address?.streetNumber || null,

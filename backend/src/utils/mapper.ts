@@ -1,7 +1,7 @@
 // backend/src/utils/mapper.ts
 
 import {
-    UserDB, User, Address, TaskDB, Task, SkillDB, Skill, OfferDB, Offer, TaskProgressDB, TaskProgress
+    UserDB, User, Address, TaskDB, Task, SkillDB, Skill, OfferDB, Offer, TaskProgressDB, TaskProgress, TaskProgressUpdateDB, TaskProgressUpdate
 } from '../types';
 
 // Helper function to map address fields
@@ -23,7 +23,7 @@ export const mapUserDBToUser = (userDB: UserDB): User => {
         id: userDB.id,
         userType: userDB.user_type,
         email: userDB.email,
-        mobileNumber: userDB.mobile_number || undefined,
+        phoneNumber: userDB.phone_number || undefined,
         createdAt: userDB.created_at,
         updatedAt: userDB.updated_at,
     };
@@ -89,7 +89,15 @@ export const mapOfferDBToOffer = (offerDB: OfferDB): Offer => {
     };
 };
 
-
+export const mapTaskProgressUpdateDBToTaskProgressUpdate = (progressDB: TaskProgressUpdateDB): TaskProgressUpdate => {
+    return {
+        id: progressDB.id,
+        taskId: progressDB.task_id,
+        providerId: progressDB.provider_id,
+        description: progressDB.description,
+        createdAt: progressDB.created_at,
+    };
+};
 export const mapTaskProgressDBToTaskProgress = (tpDB: TaskProgressDB): TaskProgress => {
     return {
         id: tpDB.id,

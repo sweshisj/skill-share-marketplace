@@ -14,7 +14,6 @@ export default function SignupPage() {
     password: '',
     firstName: '',
     lastName: '',
-    mobileNumber: '',
     companyName: '',
     phoneNumber: '',
     businessTaxNumber: '', // Example: "ABC1234567"
@@ -53,7 +52,6 @@ export default function SignupPage() {
         // Reset fields that are not applicable to the new type to avoid sending empty strings for optional fields
         firstName: newUserType === 'individual' ? prev.firstName : '',
         lastName: newUserType === 'individual' ? prev.lastName : '',
-        mobileNumber: newUserType === 'individual' ? prev.mobileNumber : '', // Mobile is optional for both, but for clarity
         companyName: newUserType === 'company' ? prev.companyName : '',
         phoneNumber: newUserType === 'company' ? prev.phoneNumber : '',
         businessTaxNumber: newUserType === 'company' ? prev.businessTaxNumber : '',
@@ -171,13 +169,13 @@ export default function SignupPage() {
             />
           </div>
           <div>
-            <label htmlFor="mobileNumber" className="block text-gray-700 text-sm font-bold mb-2">Mobile Number (Optional):</label>
+            <label htmlFor="phoneNumber" className="block text-gray-700 text-sm font-bold mb-2">Mobile Number (Optional):</label>
             <input
               type="text"
-              id="mobileNumber"
-              name="mobileNumber"
+              id="phoneNumber"
+              name="phoneNumber"
               className="shadow-sm appearance-none border border-gray-300 rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              value={formData.mobileNumber}
+              value={formData.phoneNumber}
               onChange={handleChange}
               aria-label="Mobile Number"
             />

@@ -4,7 +4,8 @@ import {
     createTaskHandler, updateTaskHandler, getMyPostedTasksHandler,getAllTasks,
     getAllOpenTasksHandler, makeOfferHandler, acceptOfferHandler,getTaskByIdController,
     rejectOfferHandler, updateTaskProgressHandler, markTaskCompletedHandler,getTaskOffersController,
-    acceptTaskCompletionHandler, rejectTaskCompletionHandler, getProviderAcceptedTasksHandler
+    acceptTaskCompletionHandler, rejectTaskCompletionHandler, getProviderAcceptedTasksHandler,
+    getTaskProgressController
 } from '../controllers/taskController';
 import { protect, authorizeRoles, isTaskOwner } from '../middleware/authMiddleware';
 
@@ -32,6 +33,7 @@ router.put('/offers/:offerId/reject', protect, authorizeRoles(['individual', 'co
 
 // Provider updates task progress (only accepted provider)
 router.post('/:taskId/progress', protect, authorizeRoles(['individual', 'company']), updateTaskProgressHandler);
+router.get('/:taskId/progress', protect, getTaskProgressController); 
 router.put('/:id/complete', protect, authorizeRoles(['individual', 'company']), markTaskCompletedHandler);
 
 // User accepts/rejects task completion (only task owner)

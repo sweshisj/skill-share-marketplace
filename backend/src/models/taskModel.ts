@@ -1,7 +1,7 @@
 // backend/src/models/taskModel.ts
 import db from '../config/db';
-import { CreateTaskRequest, Task, TaskDB, UpdateTaskRequest, TaskProgressDB, TaskProgress } from '../types';
-import { mapTaskDBToTask, mapTaskProgressDBToTaskProgress } from '../utils/mapper';
+import { CreateTaskRequest, Task, TaskDB, UpdateTaskRequest, TaskProgressDB, TaskProgress, TaskProgressUpdate, TaskProgressUpdateDB } from '../types';
+import { mapTaskDBToTask, mapTaskProgressDBToTaskProgress, mapTaskProgressUpdateDBToTaskProgressUpdate } from '../utils/mapper';
 
 export const createTask = async (userId: string, taskData: CreateTaskRequest): Promise<Task> => {
     const result = await db.query<TaskDB>(
@@ -94,4 +94,49 @@ export const findAcceptedTasksForProvider = async (providerId: string): Promise<
         [providerId]
     );
     return result.rows.map(mapTaskDBToTask);
+};
+/**
+ * @desc Creates a new progress update for a task.
+ * @param taskId The ID of the task.
+ * @param providerId The ID of the provider submitting the update.
+ * @param description The progress description.
+ * @returns Promise<TaskProgressUpdate> The created progress update.
+ */
+export const createTaskProgressUpdate = async (
+    taskId: string,
+    providerId: string,
+    description: string
+): Promise<TaskProgressUpdate> => {
+    try {
+        const result = await db.query(
+            `INSERT INTO task_progress_updates (task_id, provider_id, description)
+             VALUES ($1, $2, $3)
+             RETURNING *`,
+            [taskId, providerId, description]
+        );
+        return mapTaskProgressUpdateDBToTaskProgressUpdate(result.rows[0]);
+    } catch (error) {
+        console.error(`Error creating task progress update for task ${taskId}:`, error);
+        throw error;
+    }
+};
+
+/**
+ * @desc Fetches all progress updates for a specific task.
+ * @param taskId The ID of the task.
+ * @returns Promise<TaskProgressUpdate[]> An array of progress updates.
+ */
+export const getTaskProgressUpdates = async (taskId: string): Promise<TaskProgressUpdate[]> => {
+    try {
+        const result = await db.query(
+            `SELECT * FROM task_progress_updates
+             WHERE task_id = $1
+             ORDER BY created_at DESC`,
+            [taskId]
+        );
+        return result.rows.map(mapTaskProgressUpdateDBToTaskProgressUpdate);
+    } catch (error) {
+        console.error(`Error fetching task progress updates for task ${taskId}:`, error);
+        throw error;
+    }
 };

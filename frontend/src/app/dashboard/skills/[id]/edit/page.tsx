@@ -1,4 +1,4 @@
-// frontend/src/app/(dashboard)/skills/[id]/edit/page.tsx
+// frontend/src/app/dashboard/skills/[id]/edit/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -39,12 +39,7 @@ export default function EditSkillPage() {
         const fetchSkill = async () => {
             try {
                 const response = await api.get<Skill>(`/skills/${skillId}`);
-                // Only allow editing if the logged-in user is the skill provider
-                if (response.data.providerId !== user.id) {
-                    setError('You are not authorized to edit this skill.');
-                    setLoading(false);
-                    return;
-                }
+                
                 setFormData({
                     category: response.data.category,
                     experience: response.data.experience,

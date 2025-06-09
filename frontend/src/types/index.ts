@@ -1,5 +1,3 @@
-// backend/src/types/index.ts
-
 export type UserType = 'individual' | 'company';
 export type Currency = 'USD' | 'AUD' | 'SGD' | 'INR';
 export type WorkNature = 'onsite' | 'online';
@@ -14,33 +12,11 @@ export interface Address {
     postCode?: string;
 }
 
-// Base interface for database rows (camelCase for TS, snake_case for DB)
-export interface UserDB {
-    id: string;
-    user_type: UserType;
-    email: string;
-    password_hash: string;
-    mobile_number?: string;
-    first_name?: string;
-    last_name?: string;
-    company_name?: string;
-    phone_number?: string;
-    business_tax_number?: string;
-    street_number?: string;
-    street_name?: string;
-    city_suburb?: string;
-    state?: string;
-    post_code?: string;
-    created_at: Date;
-    updated_at: Date;
-}
-
 // User interface for API responses (camelCase)
 export interface User {
     id: string;
     userType: UserType;
     email: string;
-    mobileNumber?: string;
     firstName?: string;
     lastName?: string;
     companyName?: string;
@@ -51,25 +27,12 @@ export interface User {
     updatedAt: Date;
 }
 
-export interface TaskDB {
-    id: string;
-    user_id: string;
-    category: TaskCategory;
-    task_name: string;
-    description: string;
-    expected_start_date: string; // YYYY-MM-DD
-    expected_working_hours: number;
-    hourly_rate_offered: number;
-    rate_currency: Currency;
-    status: 'open' | 'in_progress' | 'completed_pending_review' | 'closed' | 'cancelled';
-    created_at: Date;
-    updated_at: Date;
-}
 
 export interface Task {
     id: string;
     userId: string;
     category: TaskCategory;
+    providerId?: string; 
     taskName: string;
     description: string;
     expectedStartDate: string;
@@ -81,18 +44,6 @@ export interface Task {
     updatedAt: Date;
 }
 
-
-export interface SkillDB {
-    id: string;
-    provider_id: string;
-    category: SkillCategory;
-    experience: string;
-    nature_of_work: WorkNature;
-    hourly_rate: number;
-    rate_currency: Currency;
-    created_at: Date;
-    updated_at: Date;
-}
 
 export interface Skill {
     id: string;
@@ -106,18 +57,6 @@ export interface Skill {
     updatedAt: Date;
 }
 
-export interface OfferDB {
-    id: string;
-    task_id: string;
-    provider_id: string;
-    offered_hourly_rate: number;
-    offered_rate_currency: Currency;
-    offer_status: 'pending' | 'accepted' | 'rejected' | 'withdrawn';
-    message?: string;
-    created_at: Date;
-    updated_at: Date;
-}
-
 export interface Offer {
     id: string;
     taskId: string;
@@ -128,15 +67,6 @@ export interface Offer {
     message?: string;
     createdAt: Date;
     updatedAt: Date;
-}
-
-export interface TaskProgressDB {
-    id: string;
-    task_id: string;
-    provider_id: string;
-    description: string;
-    progress_timestamp: Date;
-    created_at: Date;
 }
 
 export interface TaskProgress {
@@ -154,7 +84,6 @@ export interface CreateUserRequest {
     userType: UserType;
     email: string;
     password: string; // Plain password for signup (will be hashed)
-    mobileNumber?: string;
     firstName?: string;
     lastName?: string;
     companyName?: string;
@@ -230,4 +159,12 @@ export interface ProviderPublicDetails {
 }
 export interface OfferWithProvider extends Offer {
     providerDetails?: ProviderPublicDetails; 
+}
+
+export interface TaskProgressUpdate {
+    id: string;
+    taskId: string;
+    providerId: string;
+    description: string;
+    createdAt: Date; 
 }

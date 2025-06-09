@@ -21,11 +21,10 @@ export interface UserDB {
     user_type: UserType;
     email: string;
     password_hash: string;
-    mobile_number?: string;
+    phone_number?: string;
     first_name?: string;
     last_name?: string;
     company_name?: string;
-    phone_number?: string;
     business_tax_number?: string;
     street_number?: string;
     street_name?: string;
@@ -41,7 +40,6 @@ export interface User {
     id: string;
     userType: UserType;
     email: string;
-    mobileNumber?: string;
     firstName?: string;
     lastName?: string;
     companyName?: string;
@@ -155,7 +153,6 @@ export interface CreateUserRequest {
     userType: UserType;
     email: string;
     password: string; // Plain password for signup (will be hashed)
-    mobileNumber?: string;
     firstName?: string;
     lastName?: string;
     companyName?: string;
@@ -231,4 +228,28 @@ export interface ProviderPublicDetails {
 }
 export interface OfferWithProvider extends Offer {
     providerDetails?: ProviderPublicDetails; 
+}
+// backend/src/types/index.ts
+
+// ... (existing types like Task, Offer, User, etc.) ...
+
+export interface TaskProgressUpdateDB {
+    id: string;
+    task_id: string;
+    provider_id: string;
+    description: string;
+    created_at: Date;
+}
+
+export interface TaskProgressUpdate {
+    id: string;
+    taskId: string;
+    providerId: string;
+    description: string;
+    createdAt: Date;
+}
+
+// For incoming API requests
+export interface CreateTaskProgressRequest {
+    description: string;
 }
