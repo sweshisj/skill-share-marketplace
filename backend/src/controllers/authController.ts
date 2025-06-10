@@ -2,28 +2,49 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { createUser, findUserByEmail, findUserById } from '../models/userModel'; // Assuming findUserById now part of userModel
-import { CreateUserRequest, LoginRequest, AuthResponse, UserType, UserDB } from '../types';
+import { createUser, findUserByEmail, findUserById } from '../models/userModel';
+// Corrected imports: UserRole and UserType are now used
+import { CreateUserRequest, LoginRequest, AuthResponse, UserDB, UserRole, UserType } from '../types';
 import { mapUserDBToUser } from '../utils/mapper';
 
-const generateToken = (id: string, userType: UserType, email: string) => {
-    return jwt.sign({ id, userType, email }, process.env.JWT_SECRET || 'your_jwt_secret', { expiresIn: '1d' });
+// Updated: 'role' and 'userType' are now included in the JWT payload
+const generateToken = (id: string, role: UserRole, userType: UserType, email: string) => {
+    console.log('Generating token for user:', { id, role, userType, email });
+    return jwt.sign({ id, role, userType, email }, process.env.JWT_SECRET || 'your_jwt_secret', { expiresIn: '1h' });
 };
 
 export const registerUser = async (req: Request, res: Response) => {
     try {
         const userData: CreateUserRequest = req.body;
 
-        if (!userData.email || !userData.password || !userData.userType) {
-            res.status(400).json({ message: 'Email, password, and user type are required.' });
+        // Basic mandatory fields check: email, password, role, and userType are always required
+        if (!userData.email || !userData.password || !userData.role || !userData.userType) {
+            res.status(400).json({ message: 'Email, password, user role, and user type are required.' });
             return;
         }
-        if (userData.userType === 'individual' && (!userData.firstName || !userData.lastName || !userData.address)) {
-            res.status(400).json({ message: 'For individual users, first name, last name, and address are mandatory.' });
-            return;
-        }
-        if (userData.userType === 'company' && (!userData.companyName || !userData.businessTaxNumber || !userData.representativeFirstName || !userData.representativeLastName)) {
-            res.status(400).json({ message: 'For company users, company name, business tax number, and representative names are mandatory.' });
+
+        // --- Specific validation based on UserType ---
+        if (userData.userType === UserType.Individual) {
+            // For individual users, first name, last name, and address are mandatory.
+            if (!userData.firstName || !userData.lastName || !userData.address) {
+                res.status(400).json({ message: 'For individual users, first name, last name, and address are mandatory.' });
+                return;
+            }
+        } else if (userData.userType === UserType.Company) {
+            // For company users, company name, business tax number, and representative names (firstName/lastName) are mandatory.
+            if (!userData.companyName || !userData.businessTaxNumber || !userData.firstName || !userData.lastName) {
+                res.status(400).json({ message: 'For company users, company name, business tax number, and representative names (first & last name) are mandatory.' });
+                return;
+            }
+            // Address is also mandatory for companies based on previous logic.
+            // if (!userData.address) {
+            //     res.status(400).json({ message: 'For company users, address is mandatory.' });
+            //     return;
+            // }
+        } else {
+            // This case should ideally be caught by TypeScript if userData.userType is strictly typed,
+            // but good for runtime validation if unexpected values slip through.
+            res.status(400).json({ message: 'Invalid user type provided.' });
             return;
         }
 
@@ -36,9 +57,10 @@ export const registerUser = async (req: Request, res: Response) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(userData.password, salt);
 
-        const newUser = await createUser(userData, hashedPassword);
+        const newUser = await createUser(userData, hashedPassword); // The userModel already handles mapping
 
-        const token = generateToken(newUser.id, newUser.userType, newUser.email);
+        // Generate token with the new role and userType from the created user
+        const token = generateToken(newUser.id, newUser.role, newUser.userType, newUser.email);
 
         res.status(201).json({ token, user: newUser });
     } catch (error) {
@@ -68,8 +90,9 @@ export const loginUser = async (req: Request, res: Response) => {
             return;
         }
 
-        const token = generateToken(userDB.id, userDB.user_type, userDB.email);
-        const user = mapUserDBToUser(userDB);
+        // Generate token using userDB's role and user_type (which are snake_case from DB)
+        const token = generateToken(userDB.id, userDB.role, userDB.user_type, userDB.email);
+        const user = mapUserDBToUser(userDB); // Map DB object to frontend User interface
 
         res.json({ token, user });
     } catch (error) {
@@ -78,11 +101,11 @@ export const loginUser = async (req: Request, res: Response) => {
     }
 };
 
+// Updated AuthRequest interface to reflect the JWT payload structure (role and userType)
 interface AuthRequest extends Request {
-
-    user?: { id: string; userType: UserType; email: string };
-
+    user?: { id: string; role: UserRole; userType: UserType; email: string };
 }
+
 export const getMyProfile = async (req: AuthRequest, res: Response) => {
     try {
         if (!req.user?.id) {

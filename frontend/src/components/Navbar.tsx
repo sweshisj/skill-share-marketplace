@@ -4,6 +4,7 @@
 import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
+// No direct type import needed here as User type is correctly inferred from useAuth()
 
 export default function Navbar() {
     const { user, logout, canPostTask, canPostSkill } = useAuth();
@@ -23,12 +24,14 @@ export default function Navbar() {
                 <div className="space-x-4 flex items-center">
                     {user ? (
                         <>
+                            {/* Links for Requester role */}
                             {canPostTask() && (
                                 <>
                                     <Link href="/dashboard/my-tasks" className="hover:text-blue-200 transition-colors duration-200">My Tasks</Link>
                                     <Link href="/dashboard/create-task" className="hover:text-blue-200 transition-colors duration-200">Post Task</Link>
                                 </>
                             )}
+                            {/* Links for Provider role */}
                             {canPostSkill() && (
                                 <>
                                     <Link href="/dashboard/browse-tasks" className="hover:text-blue-200 transition-colors duration-200">Browse Tasks</Link>
@@ -48,6 +51,7 @@ export default function Navbar() {
                             </button>
                         </>
                     ) : (
+                        // Links for unauthenticated users
                         <>
                             <Link href="/login" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">Login</Link>
                             <Link href="/signup" className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">Sign Up</Link>

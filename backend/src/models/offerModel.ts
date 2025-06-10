@@ -113,6 +113,7 @@ export const findOffersWithProviderDetailsByTaskId = async (taskId: string): Pro
             // Map Provider Public Details from the joined user columns
             const providerDetails: ProviderPublicDetails = {
                 id: row.user_id, // Alias from the SQL query
+                role: row.role, // Assuming 'role' is part of the user table
                 userType: row.user_type,
                 email: row.email,
                 firstName: row.first_name,

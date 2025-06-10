@@ -1,8 +1,26 @@
-export type UserType = 'individual' | 'company';
 export type Currency = 'USD' | 'AUD' | 'SGD' | 'INR';
 export type WorkNature = 'onsite' | 'online';
 export type TaskCategory = 'Tutoring' | 'Handyman' | 'Consulting'; // Example categories
 export type SkillCategory = 'Tutoring' | 'Handyman' | 'Consulting'; // Example categories
+
+// Renamed UserType to UserType for clarity on what it represents
+export enum UserType {
+    Individual = 'individual',
+    Company = 'company',
+}
+
+export enum UserRole {
+    Requester = 'requester',
+    Provider = 'provider',
+}
+
+export enum TaskStatus {
+    Open = 'open',
+    InProgress = 'in_progress',
+    CompletedPendingReview = 'completed_pending_review',
+    Closed = 'closed',
+    Cancelled = 'cancelled',
+}
 
 export interface Address {
     streetNumber?: string;
@@ -15,18 +33,18 @@ export interface Address {
 // User interface for API responses (camelCase)
 export interface User {
     id: string;
-    userType: UserType;
+    role: UserRole;       // Maps to 'role' in DB
+    userType: UserType; // Corrected: Maps to 'user_type' in DB
     email: string;
     firstName?: string;
     lastName?: string;
     companyName?: string;
     phoneNumber?: string;
     businessTaxNumber?: string;
-    address?: Address;
+    address?: Address;    // Nested address object for cleaner API
     createdAt: Date;
     updatedAt: Date;
 }
-
 
 export interface Task {
     id: string;
@@ -43,7 +61,6 @@ export interface Task {
     createdAt: Date;
     updatedAt: Date;
 }
-
 
 export interface Skill {
     id: string;
@@ -78,20 +95,18 @@ export interface TaskProgress {
     createdAt: Date;
 }
 
-
-// Request DTOs (Data Transfer Objects)
 export interface CreateUserRequest {
-    userType: UserType;
+    role: UserRole;       // Mandatory: User must have a role
+    userType: UserType; // Corrected: Use UserType for individual/company
     email: string;
-    password: string; // Plain password for signup (will be hashed)
+    password: string;     // Plain password for signup (will be hashed)
     firstName?: string;
     lastName?: string;
     companyName?: string;
     phoneNumber?: string;
     businessTaxNumber?: string;
-    representativeFirstName?: string; // For company
-    representativeLastName?: string; // For company
-    address?: Address; // Optional for company, mandatory for individual provider
+    // representativeFirstName and representativeLastName are removed as firstName/lastName serve this purpose for companies
+    address?: Address;    // Address is optional in DTO, but may be enforced by business logic in controllers
 }
 
 export interface LoginRequest {
@@ -101,7 +116,7 @@ export interface LoginRequest {
 
 export interface AuthResponse {
     token: string;
-    user: User;
+    user: User; // The full User object after successful authentication
 }
 
 export interface CreateTaskRequest {
@@ -122,7 +137,7 @@ export interface UpdateTaskRequest {
     expectedWorkingHours?: number;
     hourlyRateOffered?: number;
     rateCurrency?: Currency;
-    status?: string;
+    status?: string; // Task status can be updated
 }
 
 export interface CreateSkillRequest {
@@ -144,21 +159,30 @@ export interface UpdateSkillRequest {
 export interface MakeOfferRequest {
     offeredHourlyRate: number;
     offeredRateCurrency: Currency;
+    message?: string; // Optional message with the offer
 }
 
-export interface UpdateTaskProgressRequest {
+export interface CreateTaskProgressRequest {
     description: string;
 }
+
+export interface UpdateTaskProgressRequest { // This interface was previously defined, but seems to only contain `description`
+    description: string;
+}
+
+
 export interface ProviderPublicDetails {
     id: string;
-    userType: UserType;
+    userType: UserType; // Corrected: Use UserType
     email: string;
     firstName?: string;
     lastName?: string;
     companyName?: string;
+    // Phone number, tax number, etc., are usually not public
 }
+
 export interface OfferWithProvider extends Offer {
-    providerDetails?: ProviderPublicDetails;
+    providerDetails?: ProviderPublicDetails; // Includes public details of the provider who made the offer
 }
 
 export interface TaskProgressUpdate {
@@ -167,7 +191,4 @@ export interface TaskProgressUpdate {
     providerId: string;
     description: string;
     createdAt: Date;
-}
-export interface CreateTaskProgressRequest {
-    description: string;
 }

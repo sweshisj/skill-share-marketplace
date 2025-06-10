@@ -21,6 +21,7 @@ const mapAddress = (row: any): Address | undefined => {
 export const mapUserDBToUser = (userDB: UserDB): User => {
     const user: User = {
         id: userDB.id,
+        role: userDB.role, // Maps to 'role' in DB
         userType: userDB.user_type,
         email: userDB.email,
         phoneNumber: userDB.phone_number || undefined,
