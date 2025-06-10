@@ -11,6 +11,7 @@ interface TaskCardProps {
     onViewOffers?: (taskId: string) => void; // For task owner to view offers
     onEdit?: (taskId: string) => void; // For task owner to edit
     onViewProgress?: (taskId: string) => void; // For task owner/provider to view progress
+    onAddTaskProgress?: (taskId: string) => void; // For the assigned provider to add new progress updates
     children?: ReactNode;
 }
 
@@ -20,7 +21,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
     onMakeOffer,
     onViewOffers,
     onEdit,
-    onViewProgress
+    onViewProgress,
+    onAddTaskProgress,
 }) => {
     return (
         <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow duration-200">
@@ -32,13 +34,12 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 <span>Hours: <span className="font-semibold">{task.expectedWorkingHours}</span></span>
                 <span>Rate: <span className="font-semibold">{task.hourlyRateOffered} {task.rateCurrency}/hr</span></span>
             </div>
-            <div className={`text-sm font-semibold py-1 px-3 rounded-full inline-block ${
-                task.status === 'open' ? 'bg-green-100 text-green-800' :
-                task.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
-                task.status === 'completed_pending_review' ? 'bg-yellow-100 text-yellow-800' :
-                task.status === 'closed' ? 'bg-gray-200 text-gray-700' :
-                'bg-red-100 text-red-800'
-            }`}>
+            <div className={`text-sm font-semibold py-1 px-3 rounded-full inline-block ${task.status === 'open' ? 'bg-green-100 text-green-800' :
+                    task.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
+                        task.status === 'completed_pending_review' ? 'bg-yellow-100 text-yellow-800' :
+                            task.status === 'closed' ? 'bg-gray-200 text-gray-700' :
+                                'bg-red-100 text-red-800'
+                }`}>
                 Status: {task.status.replace(/_/g, ' ')}
             </div>
 
@@ -74,6 +75,15 @@ const TaskCard: React.FC<TaskCardProps> = ({
                             className="bg-indigo-500 hover:bg-indigo-600 text-white text-sm py-2 px-3 rounded-md transition-colors duration-200"
                         >
                             View Progress
+                        </button>
+                    )}
+                     {/* NEW BUTTON for adding progress, visible only for in-progress tasks */}
+                    {onAddTaskProgress && task.status === 'in_progress' && (
+                        <button
+                            onClick={() => onAddTaskProgress(task.id)}
+                            className="bg-teal-500 hover:bg-teal-600 text-white text-sm py-2 px-3 rounded-md transition-colors duration-200"
+                        >
+                            Add New Progress
                         </button>
                     )}
                     {/* Add other actions like complete task, cancel task etc. here */}

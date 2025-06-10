@@ -32,7 +32,7 @@ export interface Task {
     id: string;
     userId: string;
     category: TaskCategory;
-    providerId?: string; 
+    providerId?: string;
     taskName: string;
     description: string;
     expectedStartDate: string;
@@ -158,7 +158,7 @@ export interface ProviderPublicDetails {
     companyName?: string;
 }
 export interface OfferWithProvider extends Offer {
-    providerDetails?: ProviderPublicDetails; 
+    providerDetails?: ProviderPublicDetails;
 }
 
 export interface TaskProgressUpdate {
@@ -166,5 +166,8 @@ export interface TaskProgressUpdate {
     taskId: string;
     providerId: string;
     description: string;
-    createdAt: Date; 
+    createdAt: Date;
+}
+export interface CreateTaskProgressRequest {
+    description: string;
 }

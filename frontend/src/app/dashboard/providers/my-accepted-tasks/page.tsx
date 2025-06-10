@@ -32,9 +32,6 @@ export default function MyAcceptedTasksPage() {
 
         const fetchAcceptedTasks = async () => {
             try {
-                // Assuming an endpoint to fetch tasks where the current provider's offer was accepted
-                // This might return a list of Offers, and then we fetch the corresponding Tasks.
-                // Or, the backend might join and return Task details with the accepted offer ID.
                 const response = await api.get<Task[]>(`/tasks/accepted-by-me`);
                 setAcceptedTasks(response.data);
             } catch (err: any) {
@@ -48,11 +45,16 @@ export default function MyAcceptedTasksPage() {
         fetchAcceptedTasks();
     }, [user, authLoading, router]);
 
+    // Keep this for general viewing (e.g., for task owners, or if you still want a separate view progress)
     const handleViewProgress = (taskId: string) => {
-        router.push(`/dashboard/tasks/${taskId}/progress`); // Provider can view/add progress
+        router.push(`/dashboard/tasks/${taskId}`); // Navigates to the general Task Details page
     };
 
-    // Placeholder for "Mark Complete" or "Update Progress" if needed
+    // This handler will now navigate to the NEW 'add-progress' page
+    const handleAddTaskProgress = (taskId: string) => {
+        router.push(`/dashboard/tasks/${taskId}/add-progress`); // Navigate to the new page
+    };
+
     const handleUpdateTaskStatus = (taskId: string, status: 'completed_pending_review' | 'cancelled') => {
         if (!window.confirm(`Are you sure you want to mark this task as ${status.replace(/_/g, ' ')}?`)) {
             return;
@@ -60,7 +62,6 @@ export default function MyAcceptedTasksPage() {
         api.put(`/tasks/${taskId}`, { status })
             .then(() => {
                 alert(`Task status updated to ${status.replace(/_/g, ' ')}!`);
-                // Re-fetch tasks or update state
                 setAcceptedTasks(prev => prev.map(task => task.id === taskId ? { ...task, status: status } : task));
             })
             .catch(err => {
@@ -90,13 +91,15 @@ export default function MyAcceptedTasksPage() {
                             key={task.id}
                             task={task}
                             showActions={true}
-                            onViewProgress={handleViewProgress}
-                            onMakeOffer={undefined} // Providers don't make new offers on accepted tasks
-                            onEdit={undefined} // Providers don't edit the original task details
-                            onViewOffers={undefined} // Providers don't view other offers on tasks they accepted
+                            onMakeOffer={undefined}
+                            onEdit={undefined}
+                            onViewOffers={undefined}
+                            onViewProgress={undefined} // You can keep this or set to undefined if you only want the 'add progress' button
+                            // Pass handleAddTaskProgress to the new prop, conditionally
+                            onAddTaskProgress={task.status === 'in_progress' ? handleAddTaskProgress : undefined}
                         >
-                            {/* Additional provider-specific actions here if needed */}
-                            {task.status === 'in_progress' && (
+                            {/* The "Mark Completed" button remains here, ensure it's also provider-specific */}
+                            {task.status === 'in_progress' && user?.id === task.providerId && (
                                 <div className="mt-2 flex gap-2">
                                     <button
                                         onClick={() => handleUpdateTaskStatus(task.id, 'completed_pending_review')}

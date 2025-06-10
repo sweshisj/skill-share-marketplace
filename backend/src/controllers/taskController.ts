@@ -33,6 +33,47 @@ export const createTaskHandler = async (req: AuthRequest, res: Response) => {
         res.status(500).json({ message: 'Server error creating task', error: (error as Error).message });
     }
 };
+export const markTaskCompletedByProviderHandler = async (req: AuthRequest, res: Response) => {
+    try {
+        const taskId = req.params.id;
+       
+
+        // 1. Basic validation: Check if task ID and authenticated user ID are present
+        if (!taskId) {
+           res.status(400).json({ message: 'Task ID and authenticated user ID are required.' });
+            return;
+        }
+
+        // 2. Fetch the task details
+        const task = await findTaskById(taskId);
+        if (!task) {
+            res.status(404).json({ message: 'Task not found.' });
+            return;
+        }
+
+        // 4. Status Check: Ensure the task is currently 'in_progress'
+        if (task.status !== 'in_progress') {
+            res.status(400).json({ message: `Bad Request: Task status is '${task.status}'. Only 'in_progress' tasks can be marked as completed.` });
+            return;
+        }
+
+        // 5. Update the task status
+        const updatedTask = await updateTaskStatus(taskId, 'completed_pending_review');
+
+        if (!updatedTask) {
+            // This should ideally not happen if findTaskById worked and the update query is correct
+            res.status(500).json({ message: 'Failed to update task status.' });
+            return;
+        }
+
+        // 6. Success Response
+        res.status(200).json({ message: 'Task marked as completed (pending review) successfully!', task: updatedTask });
+
+    } catch (error) {
+        console.error('Error in markTaskCompletedByProviderHandler:', error);
+        res.status(500).json({ message: 'Server error marking task completed', error: (error as Error).message });
+    }
+};
 export const getTaskByIdController = async (req: Request, res: Response) => {
     try {
         const { id } = req.params; // Extract the ID from the URL parameter

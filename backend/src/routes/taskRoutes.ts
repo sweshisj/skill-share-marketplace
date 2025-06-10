@@ -5,7 +5,7 @@ import {
     getAllOpenTasksHandler, makeOfferHandler, acceptOfferHandler,getTaskByIdController,
     rejectOfferHandler, updateTaskProgressHandler, markTaskCompletedHandler,getTaskOffersController,
     acceptTaskCompletionHandler, rejectTaskCompletionHandler, getProviderAcceptedTasksHandler,
-    getTaskProgressController
+    getTaskProgressController, markTaskCompletedByProviderHandler
 } from '../controllers/taskController';
 import { protect, authorizeRoles, isTaskOwner } from '../middleware/authMiddleware';
 
@@ -16,6 +16,7 @@ router.post('/', protect, authorizeRoles(['individual', 'company']), createTaskH
 // Providers can only see tasks they have accepted
 router.get('/accepted-by-me', protect, authorizeRoles(['individual', 'company']), getProviderAcceptedTasksHandler);
 router.get('/my-posted-tasks', protect, authorizeRoles(['individual', 'company']), getMyPostedTasksHandler);
+router.put('/:id/mark-completed-by-provider', markTaskCompletedByProviderHandler);
 
 // User can post and update tasks
 router.get('/:id', protect, getTaskByIdController); 
