@@ -29,7 +29,6 @@ export default function BrowseTasksPage() {
                 const response = await api.get<Task[]>(`/tasks?status=open`);
                 setTasks(response.data);
             } catch (err: any) {
-                console.error('Failed to fetch open tasks:', err);
                 setError(err.response?.data?.message || 'Failed to load open tasks.');
             } finally {
                 setLoading(false);
