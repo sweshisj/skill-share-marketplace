@@ -113,7 +113,7 @@ export default function CreateTaskPage() {
                 </div>
                 <div>
                     <label htmlFor="hourlyRateOffered" className="block text-gray-700 text-sm font-bold mb-2">Hourly Rate Offered:</label>
-                    <input type="number" id="hourlyRateOffered" name="hourlyRateOffered" value={formData.hourlyRateOffered} onChange={handleChange} required min="0" step="0.01"
+                    <input type="number" id="hourlyRateOffered" name="hourlyRateOffered" value={formData.hourlyRateOffered} onChange={handleChange} required min="0" step="10"
                         className="shadow-sm appearance-none border border-gray-300 rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                 </div>

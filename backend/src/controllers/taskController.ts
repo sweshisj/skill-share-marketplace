@@ -41,17 +41,14 @@ export const createTaskHandler = async (req: AuthRequest, res: Response) => {
 export const getTaskByIdController = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        console.log(`[getTaskByIdController] Attempting to fetch task with ID: ${id}`);
 
         const taskDB = await findTaskById(id);
 
         if (!taskDB) {
-            console.log(`[getTaskByIdController] Task not found for ID: ${id}`);
             res.status(404).json({ message: 'Task not found.' });
             return;
         }
 
-        console.log(`[getTaskByIdController] Task found:`, taskDB);
         res.json(mapTaskDBToTask(taskDB));
     } catch (error) {
         console.error('[getTaskByIdController] Error fetching task by ID:', error);
@@ -116,12 +113,10 @@ export const getTaskOffersController = async (req: AuthRequest, res: Response) =
             return;
         }
 
-        console.log(`[getTaskOffersController] Attempting to fetch offers and provider details for Task ID: ${taskId}`);
 
         const offersWithProviders: OfferWithProvider[] = await findOffersWithProviderDetailsByTaskId(taskId);
 
         if (offersWithProviders.length === 0) {
-            console.log(`[getTaskOffersController] No offers found for Task ID: ${taskId}`);
             res.status(200).json([]);
             return;
         }

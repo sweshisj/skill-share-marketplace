@@ -9,7 +9,6 @@ import { mapUserDBToUser } from '../utils/mapper';
 
 // Updated: 'role' and 'userType' are now included in the JWT payload
 const generateToken = (id: string, role: UserRole, userType: UserType, email: string) => {
-    console.log('Generating token for user:', { id, role, userType, email });
     return jwt.sign({ id, role, userType, email }, process.env.JWT_SECRET || 'your_jwt_secret', { expiresIn: '1h' });
 };
 

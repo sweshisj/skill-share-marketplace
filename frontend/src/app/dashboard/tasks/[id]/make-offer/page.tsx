@@ -118,7 +118,7 @@ export default function MakeOfferPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                     <label htmlFor="offeredHourlyRate" className="block text-gray-700 text-sm font-bold mb-2">Your Offered Hourly Rate:</label>
-                    <input type="number" id="offeredHourlyRate" name="offeredHourlyRate" value={formData.offeredHourlyRate} onChange={handleChange} required min="0" step="0.01"
+                    <input type="number" id="offeredHourlyRate" name="offeredHourlyRate" value={formData.offeredHourlyRate} onChange={handleChange} required min="0" step="10"
                         className="shadow-sm border border-gray-300 rounded-md w-full py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                 </div>

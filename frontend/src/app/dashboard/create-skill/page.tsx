@@ -100,7 +100,7 @@ export default function CreateSkillPage() {
                 </div>
                 <div>
                     <label htmlFor="hourlyRate" className="block text-gray-700 text-sm font-bold mb-2">Hourly Rate You Charge:</label>
-                    <input type="number" id="hourlyRate" name="hourlyRate" value={formData.hourlyRate} onChange={handleChange} required min="0" step="0.01"
+                    <input type="number" id="hourlyRate" name="hourlyRate" value={formData.hourlyRate} onChange={handleChange} required min="0" step="10"
                         className="shadow-sm border border-gray-300 rounded-md w-full py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     />
                 </div>
