@@ -1,7 +1,7 @@
 // frontend/src/app/(dashboard)/my-tasks/page.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react'; // Import useCallback
 import { useRouter } from 'next/navigation';
 import api from '../../../lib/api';
 import { Task } from '../../../types';
@@ -16,6 +16,21 @@ export default function MyTasksPage() {
     const router = useRouter();
     const { user, loading: authLoading } = useAuth();
 
+    // Memoize fetchMyTasks to prevent unnecessary re-creations
+    const fetchMyTasks = useCallback(async () => {
+        setLoading(true); // Set loading to true before fetching
+        setError(null); // Clear any previous errors
+        try {
+            const response = await api.get<Task[]>(`/tasks/my-posted-tasks`); // Backend endpoint to get tasks posted by current user
+            setTasks(response.data);
+        } catch (err: any) {
+            console.error('Failed to fetch my tasks:', err);
+            setError(err.response?.data?.message || 'Failed to load your tasks.');
+        } finally {
+            setLoading(false);
+        }
+    }, []); // No dependencies for this specific useCallback, it will be called from useEffect
+
     useEffect(() => {
         if (authLoading) return; // Wait for auth status to be determined
 
@@ -24,20 +39,8 @@ export default function MyTasksPage() {
             return;
         }
 
-        const fetchMyTasks = async () => {
-            try {
-                const response = await api.get<Task[]>(`/tasks/my-posted-tasks`); // Backend endpoint to get tasks posted by current user
-                setTasks(response.data);
-            } catch (err: any) {
-                console.error('Failed to fetch my tasks:', err);
-                setError(err.response?.data?.message || 'Failed to load your tasks.');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchMyTasks();
-    }, [user, authLoading, router]);
+        fetchMyTasks(); // Call the memoized fetch function
+    }, [user, authLoading, router, fetchMyTasks]); // Add fetchMyTasks to dependencies
 
     const handleEditTask = (taskId: string) => {
         router.push(`/dashboard/tasks/${taskId}/edit`);
@@ -50,6 +53,32 @@ export default function MyTasksPage() {
     const handleViewProgress = (taskId: string) => {
         router.push(`/dashboard/tasks/${taskId}/progress`);
     };
+
+    // --- New Handlers for Task Completion ---
+    const handleAcceptCompletion = async (taskId: string) => {
+        try {
+            await api.put(`/tasks/${taskId}/accept-completion`);
+            // Optionally, show a success message
+            alert('Task completion accepted!');
+            fetchMyTasks(); // Re-fetch tasks to update status on the page
+        } catch (err: any) {
+            console.error('Failed to accept task completion:', err);
+            alert(err.response?.data?.message || 'Failed to accept completion.');
+        }
+    };
+
+    const handleRejectCompletion = async (taskId: string) => {
+        try {
+            await api.put(`/tasks/${taskId}/reject-completion`);
+            // Optionally, show a success message
+            alert('Task completion rejected!');
+            fetchMyTasks(); // Re-fetch tasks to update status on the page
+        } catch (err: any) {
+            console.error('Failed to reject task completion:', err);
+            alert(err.response?.data?.message || 'Failed to reject completion.');
+        }
+    };
+    // --- End New Handlers ---
 
     if (loading) {
         return <div className="flex justify-center items-center h-64 text-gray-600">Loading tasks...</div>;
@@ -76,6 +105,10 @@ export default function MyTasksPage() {
                             onViewOffers={handleViewOffers}
                             onViewProgress={handleViewProgress}
                             onMakeOffer={undefined} // Task owner cannot make offer on their own task
+                            // --- Pass new handlers here ---
+                            onAcceptCompletion={handleAcceptCompletion}
+                            onRejectCompletion={handleRejectCompletion}
+                            // --- End passing new handlers ---
                         />
                     ))}
                 </div>

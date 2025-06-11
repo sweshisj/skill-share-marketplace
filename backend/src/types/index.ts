@@ -18,7 +18,7 @@ export type WorkNature = 'onsite' | 'online';
 export type TaskCategory = 'Tutoring' | 'Handyman' | 'Consulting' | 'Web Development' | 'Graphic Design'; // Ensure these match your DB enum
 export type SkillCategory = 'Tutoring' | 'Handyman' | 'Consulting' | 'Web Development' | 'Graphic Design'; // Ensure these match your DB enum
 
-export type TaskStatus = 'open' | 'in_progress' | 'completed_pending_review' | 'completed' | 'closed' | 'cancelled'; // Added 'completed' for consistency with DB enum
+export type TaskStatus = 'open' | 'in_progress' | 'completed_pending_review' | 'completed' | 'closed' | 'cancelled'|'rejected'|'assigned'; // Added 'completed' for consistency with DB enum
 export type OfferStatus = 'pending' | 'accepted' | 'rejected' | 'withdrawn'; // Consistent with DB enum
 
 

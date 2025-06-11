@@ -14,13 +14,8 @@ export enum UserRole {
     Provider = 'provider',
 }
 
-export enum TaskStatus {
-    Open = 'open',
-    InProgress = 'in_progress',
-    CompletedPendingReview = 'completed_pending_review',
-    Closed = 'closed',
-    Cancelled = 'cancelled',
-}
+export type TaskStatus = 'open' | 'in_progress' | 'completed_pending_review' | 'completed' | 'closed' | 'cancelled'|'rejected'|'assigned'; // Added 'completed' for consistency with DB enum
+
 
 export interface Address {
     streetNumber?: string;
@@ -57,7 +52,7 @@ export interface Task {
     expectedWorkingHours: number;
     hourlyRateOffered: number;
     rateCurrency: Currency;
-    status: 'open' | 'in_progress' | 'completed_pending_review' | 'closed' | 'cancelled';
+    status: TaskStatus;
     createdAt: Date;
     updatedAt: Date;
 }
