@@ -185,7 +185,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
                     )}
 
                     {/* --- Actions for other users (not requester, not provider) --- */}
-                    {onMakeOffer && task.status === 'open' && !isRequester && !isProvider && (
+                    {onMakeOffer && task.status === 'open' && isProvider && (
                         <button
                             onClick={() => onMakeOffer(task.id)}
                             className="bg-blue-500 hover:bg-blue-600 text-white text-sm py-2 px-3 rounded-md transition-colors duration-200 flex-grow"
