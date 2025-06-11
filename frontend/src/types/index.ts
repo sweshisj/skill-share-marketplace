@@ -1,9 +1,8 @@
 export type Currency = 'USD' | 'AUD' | 'SGD' | 'INR';
 export type WorkNature = 'onsite' | 'online';
-export type TaskCategory = 'Tutoring' | 'Handyman' | 'Consulting'; // Example categories
-export type SkillCategory = 'Tutoring' | 'Handyman' | 'Consulting'; // Example categories
+export type TaskCategory = 'Tutoring' | 'Handyman' | 'Consulting'; 
+export type SkillCategory = 'Tutoring' | 'Handyman' | 'Consulting'; 
 
-// Renamed UserType to UserType for clarity on what it represents
 export enum UserType {
     Individual = 'individual',
     Company = 'company',
@@ -25,18 +24,17 @@ export interface Address {
     postCode?: string;
 }
 
-// User interface for API responses (camelCase)
 export interface User {
     id: string;
-    role: UserRole;       // Maps to 'role' in DB
-    userType: UserType; // Corrected: Maps to 'user_type' in DB
+    role: UserRole;       
+    userType: UserType; 
     email: string;
     firstName?: string;
     lastName?: string;
     companyName?: string;
     phoneNumber?: string;
     businessTaxNumber?: string;
-    address?: Address;    // Nested address object for cleaner API
+    address?: Address;    
     createdAt: Date;
     updatedAt: Date;
 }
@@ -91,17 +89,16 @@ export interface TaskProgress {
 }
 
 export interface CreateUserRequest {
-    role: UserRole;       // Mandatory: User must have a role
-    userType: UserType; // Corrected: Use UserType for individual/company
+    role: UserRole;       
+    userType: UserType; 
     email: string;
-    password: string;     // Plain password for signup (will be hashed)
+    password: string;     
     firstName?: string;
     lastName?: string;
     companyName?: string;
     phoneNumber?: string;
     businessTaxNumber?: string;
-    // representativeFirstName and representativeLastName are removed as firstName/lastName serve this purpose for companies
-    address?: Address;    // Address is optional in DTO, but may be enforced by business logic in controllers
+    address?: Address;    
 }
 
 export interface LoginRequest {
@@ -111,7 +108,7 @@ export interface LoginRequest {
 
 export interface AuthResponse {
     token: string;
-    user: User; // The full User object after successful authentication
+    user: User; 
 }
 
 export interface CreateTaskRequest {
@@ -132,7 +129,7 @@ export interface UpdateTaskRequest {
     expectedWorkingHours?: number;
     hourlyRateOffered?: number;
     rateCurrency?: Currency;
-    status?: string; // Task status can be updated
+    status?: string; 
 }
 
 export interface CreateSkillRequest {
@@ -154,30 +151,29 @@ export interface UpdateSkillRequest {
 export interface MakeOfferRequest {
     offeredHourlyRate: number;
     offeredRateCurrency: Currency;
-    message?: string; // Optional message with the offer
+    message?: string; 
 }
 
 export interface CreateTaskProgressRequest {
     description: string;
 }
 
-export interface UpdateTaskProgressRequest { // This interface was previously defined, but seems to only contain `description`
+export interface UpdateTaskProgressRequest { 
     description: string;
 }
 
 
 export interface ProviderPublicDetails {
     id: string;
-    userType: UserType; // Corrected: Use UserType
+    userType: UserType; 
     email: string;
     firstName?: string;
     lastName?: string;
     companyName?: string;
-    // Phone number, tax number, etc., are usually not public
 }
 
 export interface OfferWithProvider extends Offer {
-    providerDetails?: ProviderPublicDetails; // Includes public details of the provider who made the offer
+    providerDetails?: ProviderPublicDetails; 
 }
 
 export interface TaskProgressUpdate {

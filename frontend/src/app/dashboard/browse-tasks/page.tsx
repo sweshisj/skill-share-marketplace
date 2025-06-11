@@ -25,7 +25,6 @@ export default function BrowseTasksPage() {
 
         const fetchOpenTasks = async () => {
             try {
-                // Assuming an endpoint to fetch all open tasks
                 const response = await api.get<Task[]>(`/tasks?status=open`);
                 setTasks(response.data);
             } catch (err: any) {

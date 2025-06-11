@@ -2,7 +2,7 @@
 import { Router } from 'express';
 import { createSkillHandler, getSkillHandler, updateSkillHandler, getMySkillsHandler, deleteUserSkillHandler } from '../controllers/skillController';
 import { protect, authorizeRoles } from '../middleware/authMiddleware';
-import { UserRole } from '../types'; // Import UserRole enum
+import { UserRole } from '../types'; 
 
 const router = Router();
 

@@ -8,7 +8,7 @@ import {
     getTaskProgressController, markTaskCompletedByProviderHandler
 } from '../controllers/taskController';
 import { protect, authorizeRoles, isTaskOwner } from '../middleware/authMiddleware';
-import { UserRole } from '../types'; // Import UserRole enum
+import { UserRole } from '../types'; 
 
 const router = Router();
 router.get('/', getAllTasks);
@@ -23,8 +23,6 @@ router.put('/:id/mark-completed-by-provider', markTaskCompletedByProviderHandler
 router.get('/:id', protect, getTaskByIdController); 
 router.put('/:id', protect, authorizeRoles([UserRole.Requester]), isTaskOwner, updateTaskHandler);
 
-// Provider can view open tasks
-// router.get('/open', protect, authorizeRoles([UserRole.Provider]), getAllOpenTasksHandler);
 // Provider can make an offer
 router.get('/:taskId/offers', protect, getTaskOffersController);
 router.post('/:taskId/offers', protect, authorizeRoles([UserRole.Provider]), makeOfferHandler);

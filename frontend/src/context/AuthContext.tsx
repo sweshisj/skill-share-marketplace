@@ -28,7 +28,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const router = useRouter();
 
     useEffect(() => {
-        // This effect runs only on the client side
         const storedToken = localStorage.getItem('token');
         const storedUserJson = localStorage.getItem('user'); // Get the JSON string
 
@@ -39,12 +38,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 // Set the token in Axios default headers immediately
                 api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
 
-                // Instead of always fetching /auth/me, you can rely on storedUser
-                // and optionally revalidate with /auth/me periodically or on specific actions.
                 setUser(storedUser);
 
-                // Optional: Revalidate token and fetch full user data from backend
-                // This is good for keeping data fresh and validating tokens are still active.
                 api.get<User>('/auth/me')
                     .then(response => {
                         // Update user in state and local storage if fresh data is different
@@ -61,8 +56,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                         setToken(null);
                         setUser(null);
                         delete api.defaults.headers.common['Authorization']; // Remove header
-                        // Optionally, redirect to login if auto-reauth fails
-                        // router.push('/login');
+                    
                     })
                     .finally(() => setLoading(false));
 

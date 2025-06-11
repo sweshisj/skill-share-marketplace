@@ -1,5 +1,4 @@
-// frontend/src/app/(auth)/login/page.tsx
-'use client'; // This directive marks the component as a Client Component
+'use client'; 
 
 import { useState } from 'react';
 import { useAuth } from '../../../context/AuthContext';

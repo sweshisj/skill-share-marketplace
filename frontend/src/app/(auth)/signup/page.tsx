@@ -1,18 +1,15 @@
-// frontend/src/app/(auth)/signup/page.tsx
-'use client'; // This directive marks the component as a Client Component
+'use client'; 
 
 import { useState } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import Link from 'next/link';
-// Corrected imports: Use UserType and UserRole
 import { CreateUserRequest, UserType, UserRole } from '../../../types'; 
 
 export default function SignupPage() {
-    // Renamed userType to userType for consistency with backend types
     const [userType, setUserType] = useState<UserType>(UserType.Individual);
     const [formData, setFormData] = useState<CreateUserRequest>({
         role: UserRole.Requester, // Default role, user can change this
-        userType: UserType.Individual, // Renamed from userType
+        userType: UserType.Individual, 
         email: '',
         password: '',
         firstName: '',
@@ -50,15 +47,11 @@ export default function SignupPage() {
         setFormData(prev => ({
             ...prev,
             userType: newUserType, // Update userType in formData
-            // Reset fields that are not applicable to the new type to avoid sending empty strings for optional fields
             firstName: newUserType === UserType.Individual ? prev.firstName : '',
             lastName: newUserType === UserType.Individual ? prev.lastName : '',
             companyName: newUserType === UserType.Company ? prev.companyName : '',
-            // phoneNumber for individual is optional, for company it's optional
             phoneNumber: newUserType === UserType.Company ? prev.phoneNumber : prev.phoneNumber,
             businessTaxNumber: newUserType === UserType.Company ? prev.businessTaxNumber : '',
-            // Representative first/last names are now handled by firstName/lastName fields
-            // Address is mandatory for individual, optional for company. Reset it if switching from company to individual.
             address: newUserType === UserType.Individual
                 ? prev.address || { streetNumber: '', streetName: '', citySuburb: '', state: '', postCode: '' }
                 : {} // Use empty object for company if not filled
@@ -101,9 +94,6 @@ export default function SignupPage() {
                 delete dataToSend.address;
             }
         }
-
-
-        // Ensure that specific fields are only sent if applicable to the user type
         if (userType === UserType.Individual) {
             if (!dataToSend.firstName || !dataToSend.lastName ||
                 !dataToSend.address?.streetName || !dataToSend.address.citySuburb ||
@@ -111,13 +101,11 @@ export default function SignupPage() {
                 setError('For individual signup, First Name, Last Name, and a complete Address are mandatory.');
                 return;
             }
-            // Ensure company-specific fields are not sent for individuals
             delete (dataToSend as any).companyName;
             delete (dataToSend as any).businessTaxNumber;
-            // The `phoneNumber` field is now optional for both individual and company, so no need to delete it.
         } else { // Company
             if (!dataToSend.companyName || !dataToSend.businessTaxNumber ||
-                !dataToSend.firstName || !dataToSend.lastName) { // firstName and lastName are now for representative
+                !dataToSend.firstName || !dataToSend.lastName) { 
                 setError('For company signup, Company Name, Business Tax Number, and Representative Full Name are mandatory.');
                 return;
             }
@@ -125,8 +113,6 @@ export default function SignupPage() {
                 setError('Business Tax Number must be 10 capital letters and digits (A-Z, 0-9).');
                 return;
             }
-            // Ensure individual-specific fields are not sent for companies (firstName/lastName are kept for representative)
-            // No need to delete firstName/lastName as they are used for representative
         }
 
         try {
@@ -146,11 +132,11 @@ export default function SignupPage() {
                     <div>
                         <label htmlFor="userType" className="block text-gray-700 text-sm font-bold mb-2">Account Type:</label>
                         <select
-                            id="userType" // Renamed from userType
-                            name="userType" // Renamed from userType
+                            id="userType" 
+                            name="userType"
                             className="shadow-sm border border-gray-300 rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            value={userType} // Renamed from userType
-                            onChange={handleUserTypeChange} // Renamed from handleUserTypeChange
+                            value={userType} 
+                            onChange={handleUserTypeChange} 
                             aria-label="Account Type"
                         >
                             <option value={UserType.Individual}>Individual</option>

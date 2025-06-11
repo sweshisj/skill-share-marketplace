@@ -21,7 +21,7 @@ const mapAddress = (row: any): Address | undefined => {
 export const mapUserDBToUser = (userDB: UserDB): User => {
     const user: User = {
         id: userDB.id,
-        role: userDB.role, // Maps to 'role' in DB
+        role: userDB.role, 
         userType: userDB.user_type,
         email: userDB.email,
         phoneNumber: userDB.phone_number || undefined,
@@ -37,9 +37,9 @@ export const mapUserDBToUser = (userDB: UserDB): User => {
         user.companyName = userDB.company_name || undefined;
         user.phoneNumber = userDB.phone_number || undefined;
         user.businessTaxNumber = userDB.business_tax_number || undefined;
-        user.firstName = userDB.first_name || undefined; // Representative first name
-        user.lastName = userDB.last_name || undefined;   // Representative last name
-        user.address = mapAddress(userDB); // Optional for company
+        user.firstName = userDB.first_name || undefined; 
+        user.lastName = userDB.last_name || undefined;   
+        user.address = mapAddress(userDB); 
     }
     return user;
 };
@@ -52,7 +52,7 @@ export const mapTaskDBToTask = (taskDB: TaskDB): Task => {
         taskName: taskDB.task_name,
         description: taskDB.description,
         expectedStartDate: taskDB.expected_start_date,
-        expectedWorkingHours: parseFloat(taskDB.expected_working_hours.toString()), // Convert numeric to float
+        expectedWorkingHours: parseFloat(taskDB.expected_working_hours.toString()), 
         hourlyRateOffered: parseFloat(taskDB.hourly_rate_offered.toString()),
         rateCurrency: taskDB.rate_currency,
         status: taskDB.status,

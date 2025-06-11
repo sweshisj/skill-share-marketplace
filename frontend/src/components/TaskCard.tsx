@@ -1,23 +1,20 @@
-// frontend/src/components/TaskCard.tsx
 import React, { ReactNode } from 'react';
 import Link from 'next/link';
-import { Task, UserRole } from '../types'; // Ensure correct path, import UserRole
-import { useAuth } from '../context/AuthContext'; // Import useAuth to get current user info
+import { Task, UserRole } from '../types'; 
+import { useAuth } from '../context/AuthContext'; 
 
-// Define TaskStatusString for clarity and type safety based on your backend statuses
 type TaskStatusString = 'open' | 'assigned' | 'in_progress' | 'completed_pending_review' | 'closed' | 'cancelled' | 'rejected';
 
 interface TaskCardProps {
     task: Task;
-    showActions?: boolean; // Whether to show action buttons like Edit, Make Offer, etc.
-    // Callback for actions
+    showActions?: boolean; 
     onMakeOffer?: (taskId: string) => void;
     onViewOffers?: (taskId: string) => void; // For task owner to view offers
     onEdit?: (taskId: string) => void; // For task owner to edit
     onViewProgress?: (taskId: string) => void; // For task owner/provider to view progress
     onAddTaskProgress?: (taskId: string) => void; // For the assigned provider to add new progress updates
-    onAcceptCompletion?: (taskId: string) => void; // New prop for requester to accept completion
-    onRejectCompletion?: (taskId: string) => void; // New prop for requester to reject completion
+    onAcceptCompletion?: (taskId: string) => void; // for requester to accept completion
+    onRejectCompletion?: (taskId: string) => void; // for requester to reject completion
     children?: ReactNode;
 }
 
@@ -29,15 +26,12 @@ const TaskCard: React.FC<TaskCardProps> = ({
     onEdit,
     onViewProgress,
     onAddTaskProgress,
-    onAcceptCompletion, // Destructure new prop
-    onRejectCompletion, // Destructure new prop
+    onAcceptCompletion, 
+    onRejectCompletion, 
 }) => {
     const { user } = useAuth(); // Get the current authenticated user
 
-    // Determine if the current user is the requester of THIS specific task
     const isRequester = user && user.role === UserRole.Requester;
-    // Determine if the current user is the provider assigned to THIS specific task
-    // Assuming `task.providerId` is available when a task is assigned.
     const isProvider = user && user.role === UserRole.Provider;
 
     // Helper to get status display text
@@ -85,10 +79,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
             {showActions && (
                 <div className="mt-4 flex flex-wrap gap-2">
 
-                    {/* --- Requester-specific actions --- */}
                     {isRequester && (
                         <>
-                            {/* Actions for 'completed_pending_review' status (Accept/Reject) */}
                             {task.status === 'completed_pending_review' && (
                                 <>
                                     {onAcceptCompletion && (
@@ -110,7 +102,6 @@ const TaskCard: React.FC<TaskCardProps> = ({
                                 </>
                             )}
 
-                            {/* Other Requester actions (when not pending review) */}
                             {task.status !== 'completed_pending_review' && (
                                 <>
                                     {onEdit && (task.status === 'open' || task.status === 'rejected') && (
@@ -152,7 +143,6 @@ const TaskCard: React.FC<TaskCardProps> = ({
                         </>
                     )}
 
-                    {/* --- Provider-specific actions --- */}
                     {isProvider && (
                         <>
                             {onAddTaskProgress && task.status === 'in_progress' && (
@@ -163,28 +153,10 @@ const TaskCard: React.FC<TaskCardProps> = ({
                                     Add New Progress
                                 </button>
                             )}
-                            {/* Example: Provider can mark task as completed */}
-                            {/* You'd need an `onMarkComplete` prop and corresponding logic in `MyAssignedTasksPage` */}
-                            {/* {(task.status === 'in_progress' || task.status === 'rejected') && (
-                                <button
-                                    onClick={() => { /* Call onMarkComplete here */ /* }}
-                                    className="bg-green-500 hover:bg-green-600 text-white text-sm py-2 px-3 rounded-md transition-colors duration-200 flex-grow"
-                                >
-                                    Mark as Completed
-                                </button>
-                            )} */}
-                            {/* Provider View Details, if needed */}
-                            {/* <Link href={`/dashboard/assigned-tasks/${task.id}`} className="flex-grow">
-                                <button
-                                    className="w-full bg-gray-500 hover:bg-gray-600 text-white text-sm py-2 px-3 rounded-md transition-colors duration-200"
-                                >
-                                    View My Task
-                                </button>
-                            </Link> */}
+                           
                         </>
                     )}
 
-                    {/* --- Actions for other users (not requester, not provider) --- */}
                     {onMakeOffer && task.status === 'open' && isProvider && (
                         <button
                             onClick={() => onMakeOffer(task.id)}
@@ -194,12 +166,6 @@ const TaskCard: React.FC<TaskCardProps> = ({
                         </button>
                     )}
 
-                    {/* Generic "View Details" for public Browse or non-involved users
-                        Only show if no other actions are applicable and the user isn't the requester/provider
-                        and it's not a private/assigned task that only the involved parties can see.
-                        Consider carefully where this card is used. If it's only in "My Tasks" or "My Assigned Tasks",
-                        this might not be needed.
-                    */}
                     {!isRequester && !isProvider && (task.status === 'open' || task.status === 'closed') && (
                         <Link href={`/tasks/${task.id}`} className="flex-grow">
                             <button

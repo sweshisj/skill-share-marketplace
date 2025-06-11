@@ -1,6 +1,5 @@
-// frontend/src/components/SkillCard.tsx
 import React from 'react';
-import { Skill } from '../types'; // Ensure correct path
+import { Skill } from '../types'; 
 
 interface SkillCardProps {
     skill: Skill;

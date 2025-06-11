@@ -1,4 +1,3 @@
-// frontend/src/lib/api.ts
 import axios from 'axios';
 
 // Ensure NEXT_PUBLIC_BACKEND_URL is set in your .env.local file
@@ -31,10 +30,6 @@ api.interceptors.response.use((response) => response, (error) => {
         // Clear token and redirect to login on 401
         if (typeof window !== 'undefined') {
             localStorage.removeItem('token');
-            // This global redirect might cause issues with Next.js App Router.
-            // Better to handle redirection in the components themselves,
-            // or use a dedicated hook for auth state management.
-            // For now, we'll let components handle the redirect, but clear token here.
         }
     }
     return Promise.reject(error);

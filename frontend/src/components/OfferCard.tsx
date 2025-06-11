@@ -1,14 +1,13 @@
-// frontend/src/components/OfferCard.tsx
 import React from 'react';
-import { Offer, ProviderPublicDetails } from '../types'; // Assuming User is also needed for provider info
+import { Offer, ProviderPublicDetails } from '../types'; 
 
 interface OfferCardProps {
     offer: Offer;
-    provider?: ProviderPublicDetails; // Optional: To display provider details if available
+    provider?: ProviderPublicDetails; 
     showActions?: boolean;
     onAccept?: (offerId: string) => void;
     onReject?: (offerId: string) => void;
-    onViewProvider?: (providerId: string) => void; // Link to view provider profile (if implemented)
+    onViewProvider?: (providerId: string) => void; 
 }
 
 const OfferCard: React.FC<OfferCardProps> = ({ offer, provider, showActions = true, onAccept, onReject, onViewProvider }) => {
@@ -19,8 +18,6 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, provider, showActions = tr
         withdrawn: 'bg-gray-100 text-gray-600',
     };
 
-    // Ensure offerStatus is a string before calling .replace()
-    // Using nullish coalescing operator '??' to provide a default string if offer.offerStatus is null/undefined
     const displayStatus = offer.offerStatus?.replace(/_/g, ' ') ?? 'Unknown Status';
 
     return (

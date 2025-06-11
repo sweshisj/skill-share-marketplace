@@ -1,13 +1,10 @@
-// backend/src/controllers/authController.ts
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { createUser, findUserByEmail, findUserById } from '../models/userModel';
-// Corrected imports: UserRole and UserType are now used
 import { CreateUserRequest, LoginRequest, AuthResponse, UserDB, UserRole, UserType } from '../types';
 import { mapUserDBToUser } from '../utils/mapper';
 
-// Updated: 'role' and 'userType' are now included in the JWT payload
 const generateToken = (id: string, role: UserRole, userType: UserType, email: string) => {
     return jwt.sign({ id, role, userType, email }, process.env.JWT_SECRET || 'your_jwt_secret', { expiresIn: '1h' });
 };
@@ -16,33 +13,23 @@ export const registerUser = async (req: Request, res: Response) => {
     try {
         const userData: CreateUserRequest = req.body;
 
-        // Basic mandatory fields check: email, password, role, and userType are always required
         if (!userData.email || !userData.password || !userData.role || !userData.userType) {
             res.status(400).json({ message: 'Email, password, user role, and user type are required.' });
             return;
         }
 
-        // --- Specific validation based on UserType ---
         if (userData.userType === UserType.Individual) {
-            // For individual users, first name, last name, and address are mandatory.
             if (!userData.firstName || !userData.lastName || !userData.address) {
                 res.status(400).json({ message: 'For individual users, first name, last name, and address are mandatory.' });
                 return;
             }
         } else if (userData.userType === UserType.Company) {
-            // For company users, company name, business tax number, and representative names (firstName/lastName) are mandatory.
             if (!userData.companyName || !userData.businessTaxNumber || !userData.firstName || !userData.lastName) {
                 res.status(400).json({ message: 'For company users, company name, business tax number, and representative names (first & last name) are mandatory.' });
                 return;
             }
-            // Address is also mandatory for companies based on previous logic.
-            // if (!userData.address) {
-            //     res.status(400).json({ message: 'For company users, address is mandatory.' });
-            //     return;
-            // }
         } else {
-            // This case should ideally be caught by TypeScript if userData.userType is strictly typed,
-            // but good for runtime validation if unexpected values slip through.
+           
             res.status(400).json({ message: 'Invalid user type provided.' });
             return;
         }

@@ -1,15 +1,11 @@
-// backend/src/middleware/authMiddleware.ts
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-// Corrected imports: UserRole and UserType (renamed from UserType) are now used
-import { UserRole, UserType, UserDB, TaskDB } from '../types'; // Corrected import for UserType
+import { UserRole, UserType, UserDB, TaskDB } from '../types';
 import { findUserById } from '../models/userModel';
 import { findTaskById } from '../models/taskModel';
 
-// Updated AuthRequest interface to reflect the JWT payload structure
-// It should contain 'role' (UserRole) and 'userType' (UserType)
 interface AuthRequest extends Request {
-    user?: { id: string; role: UserRole; userType: UserType; email: string }; // Changed userType to userType
+    user?: { id: string; role: UserRole; userType: UserType; email: string }; 
 }
 
 export const protect = async (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -27,8 +23,6 @@ export const protect = async (req: AuthRequest, res: Response, next: NextFunctio
 
     try {
         const secret = process.env.JWT_SECRET || 'your_jwt_secret';
-        // Verify the token and cast decoded payload to the expected structure
-        // The decoded payload should reflect the structure used when the token was signed
         const decoded = jwt.verify(token, secret) as { id: string; role: UserRole; userType: UserType; email: string; iat: number; exp: number }; // Changed userType to userType
 
         // Find the user by ID from the decoded token payload
@@ -41,14 +35,13 @@ export const protect = async (req: AuthRequest, res: Response, next: NextFunctio
         }
 
         // Attach user data to the request object for subsequent middleware/route handlers
-        // Ensure consistency with the AuthRequest interface and DB field names
         req.user = {
             id: user.id,
-            role: user.role,           // Use 'role' from UserDB (which should be UserRole)
-            userType: user.user_type, // Use 'user_type' from UserDB (which should be UserType)
+            role: user.role,           
+            userType: user.user_type, 
             email: user.email
         };
-        next(); // Proceed to the next middleware/route handler
+        next(); 
     } catch (error) {
         console.error('Token verification failed:', error);
         res.status(401).json({ message: 'Not authorized, token failed' });
@@ -56,11 +49,8 @@ export const protect = async (req: AuthRequest, res: Response, next: NextFunctio
     }
 };
 
-// `roles` now accepts an array of `UserRole`
 export const authorizeRoles = (roles: UserRole[]) => {
     return (req: AuthRequest, res: Response, next: NextFunction) => {
-        // Check if user is authenticated and their role is included in the allowed roles
-        // This 'role' comes from req.user set in the 'protect' middleware
         if (!req.user || !roles.includes(req.user.role)) {
             console.log('Unauthorized access attempt:', req.user);
             console.log(`Unauthorized access attempt by user with role: ${req.user?.role}`);

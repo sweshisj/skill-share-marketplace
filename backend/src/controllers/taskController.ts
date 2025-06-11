@@ -9,7 +9,6 @@ import { createOffer, findOfferById, updateOfferStatus, findOffersByTaskId, find
 import { mapTaskDBToTask, mapOfferDBToOffer } from '../utils/mapper';
 import { findOffersWithProviderDetailsByTaskId, findOfferByProviderIdAndTaskId } from '../models/offerModel';
 
-// Updated AuthRequest interface to reflect the JWT payload structure (role and userType)
 interface AuthRequest extends Request {
     user?: { id: string; role: UserRole; userType: UserType; email: string };
     task?: any; // To hold task data from middleware, consider typing this more specifically as TaskDB
@@ -84,7 +83,6 @@ export const markTaskCompletedByProviderHandler = async (req: AuthRequest, res: 
         const updatedTask = await updateTaskStatus(taskId, 'completed_pending_review');
 
         if (!updatedTask) {
-            // This should ideally not happen if findTaskById worked and the update query is correct
             res.status(500).json({ message: 'Failed to update task status.' });
             return;
         }
@@ -151,7 +149,6 @@ export const updateTaskHandler = async (req: AuthRequest, res: Response) => {
             res.status(404).json({ message: 'Task not found or you do not own it.' });
             return;
         }
-        // Additional business logic: can only update 'open' tasks
         if (existingTask.status !== 'open') {
             res.status(400).json({ message: 'Cannot update a task that is not in "open" status.' });
             return;

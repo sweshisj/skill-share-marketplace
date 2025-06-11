@@ -1,8 +1,7 @@
 // backend/src/models/userModel.ts
 import db from '../config/db';
-// Corrected imports to use the new UserRole and UserType enums
 import { CreateUserRequest, User, UserDB, UserRole, UserType } from '../types';
-import { mapUserDBToUser } from '../utils/mapper'; // Assuming mapUserDBToUser correctly handles the new 'role' and 'user_type' fields
+import { mapUserDBToUser } from '../utils/mapper'; 
 
 /**
  * Creates a new user entry in the database.
@@ -16,8 +15,8 @@ export const createUser = async (userData: CreateUserRequest, hashedPassword: st
         await client.query('BEGIN'); // Start a transaction
 
         const {
-            role,           // Now directly from CreateUserRequest
-            userType,     // Now directly from CreateUserRequest
+            role,          
+            userType,    
             email,
             firstName,
             lastName,
@@ -25,9 +24,6 @@ export const createUser = async (userData: CreateUserRequest, hashedPassword: st
             phoneNumber,
             businessTaxNumber,
             address
-            // 'representativeFirstName' and 'representativeLastName' are no longer directly used
-            // for database mapping, as 'firstName' and 'lastName' are considered the primary
-            // name fields for the user (or their representative if it's a company).
         } = userData;
 
         // Insert new user into the 'users' table
@@ -50,15 +46,15 @@ export const createUser = async (userData: CreateUserRequest, hashedPassword: st
             ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
             RETURNING *`, // RETURNING * fetches the newly created row
             [
-                role,                                         // Value for the 'role' column
-                userType,                                   // Value for the 'user_type' column
+                role,                                         
+                userType,                                   
                 email,
                 hashedPassword,
-                firstName || null,                            // Use firstName directly
-                lastName || null,                             // Use lastName directly
-                userType === UserType.Company ? companyName || null : null, // company_name only if userType is 'company'
+                firstName || null,                            
+                lastName || null,                             
+                userType === UserType.Company ? companyName || null : null, 
                 phoneNumber || null,
-                userType === UserType.Company ? businessTaxNumber || null : null, // business_tax_number only if userType is 'company'
+                userType === UserType.Company ? businessTaxNumber || null : null, 
                 address?.streetNumber || null,
                 address?.streetName || null,
                 address?.citySuburb || null,
@@ -67,8 +63,7 @@ export const createUser = async (userData: CreateUserRequest, hashedPassword: st
             ]
         );
 
-        await client.query('COMMIT'); // Commit the transaction
-        // Map the database row to the frontend User interface
+        await client.query('COMMIT'); 
         return mapUserDBToUser(result.rows[0]);
 
     } catch (error) {

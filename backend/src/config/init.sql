@@ -32,8 +32,8 @@ DROP TYPE IF EXISTS currency_type;
 DROP TYPE IF EXISTS work_nature_type;
 DROP TYPE IF EXISTS task_category_type;
 DROP TYPE IF EXISTS skill_category_type;
-DROP TYPE IF EXISTS task_status_enum; -- New enum
-DROP TYPE IF EXISTS offer_status_enum; -- New enum
+DROP TYPE IF EXISTS task_status_enum; 
+DROP TYPE IF EXISTS offer_status_enum; 
 
 -- Ensure the UUID extension is enabled (run this once per database)
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -293,4 +293,4 @@ EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_skills_updated_at
 BEFORE UPDATE ON skills
 FOR EACH ROW
-EXECUTE FUNCTION update_updated_at_column(); -- New trigger for skills table
+EXECUTE FUNCTION update_updated_at_column(); 

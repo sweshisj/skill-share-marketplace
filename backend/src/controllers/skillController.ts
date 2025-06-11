@@ -1,4 +1,3 @@
-// backend/src/controllers/skillController.ts
 import { Request, Response } from 'express';
 import { CreateSkillRequest, UpdateSkillRequest, UserType } from '../types';
 import { createSkill, findSkillById, updateSkill, findSkillsByProviderId, deleteUserSkill, findSkillBySkillId } from '../models/skillModel';
