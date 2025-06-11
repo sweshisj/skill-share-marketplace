@@ -63,14 +63,14 @@ psql -U postgres -d skillshare_db -f src/config/init.sql
 
 ### Running Tests
 
-### Frontend tests
+#### Frontend tests
 
 ```bash
 cd frontend
 npm test
 ```
 
-### Backend tests
+#### Backend tests
 
 ```bash
 cd backend
