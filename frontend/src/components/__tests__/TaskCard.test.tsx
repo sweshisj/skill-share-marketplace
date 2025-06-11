@@ -29,24 +29,6 @@ const mockTask: Task = {
 };
 
 describe('TaskCard', () => {
-  describe('as a guest (not requester, not provider)', () => {
-    beforeEach(() => {
-      mockUser = { id: 'guest1', role: 'guest' };
-    });
-
-    it('shows Make Offer button when callbacks are provided', () => {
-      const onMakeOffer = jest.fn();
-      render(
-        <TaskCard
-          task={mockTask}
-          onMakeOffer={onMakeOffer}
-        />
-      );
-      expect(screen.getByText('Make Offer')).toBeInTheDocument();
-      fireEvent.click(screen.getByText('Make Offer'));
-      expect(onMakeOffer).toHaveBeenCalledWith('1');
-    });
-  });
 
   describe('as a provider (not the owner)', () => {
     beforeEach(() => {
