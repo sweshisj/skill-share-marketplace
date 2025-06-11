@@ -1,7 +1,6 @@
 # Skill Share Marketplace
 
-A full-stack web application for connecting people who need help with tasks to skilled providers.  
-Built with React, Next.js, TypeScript, and Node.js.
+A full-stack web application designed to seamlessly connect individuals seeking assistance with various tasks to skilled providers eager to offer their expertise. This platform streamlines task management, from posting and Browse to offer negotiation and progress tracking, fostering efficient collaboration within a community-driven environment.
 
 ---
 
@@ -64,7 +63,17 @@ psql -U postgres -d skillshare_db -f src/config/init.sql
 
 ### Running Tests
 
+#### Frontend tests
+
 ```bash
+cd frontend
+npm test
+```
+
+#### Backend tests
+
+```bash
+cd backend
 npm test
 ```
 
